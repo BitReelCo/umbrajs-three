@@ -24,10 +24,8 @@
   let renderer = new THREE.WebGLRenderer({ canvas })
 
   // Initialize Umbra library with the given renderer
-  let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {
-    workerScriptURL: "../dist/UmbraPlayerWorker.js"
-  })
-  
+  let Umbra = await UmbraRuntime.initWithThreeJS(renderer)
+
   const libinfo = Umbra.umbrajs.getLibraryInfo()
   console.log(`Runtime build time: ${libinfo.buildTime}`)
   console.log(`Runtime build hash: ${libinfo.version}`)
