@@ -24,7 +24,7 @@
 
   // Initialize the library and create a three.js object that contains our scene
 
-  let Umbra = await UmbraRuntime.initWithThreeJS(renderer)
+  let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {workerScriptURL: "../dist/UmbraPlayerWorker.js",})
 
   let umbraScene = Umbra.createScene('key=pubk-72475579-2ca4-49da-9ff5-6e4fbf0ba170&project=1005906&model=321704672')
 

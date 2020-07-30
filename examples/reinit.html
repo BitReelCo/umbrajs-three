@@ -35,7 +35,7 @@
 
   // Initialize the library
 
-  let Umbra = await UmbraRuntime.initWithThreeJS(renderer)
+  let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {workerScriptURL: "../dist/UmbraPlayerWorker.js"})
 
 
   if (quality) {

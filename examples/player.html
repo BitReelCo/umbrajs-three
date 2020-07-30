@@ -35,7 +35,7 @@
 
   // Initialize the library and create a three.js object that contains our scene
 
-  let Umbra = await UmbraRuntime.initWithThreeJS(renderer)
+  let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {workerScriptURL: "../dist/UmbraPlayerWorker.js"})
 
   let umbraScene = Umbra.createScene(document.location.href)
 
@@ -188,7 +188,6 @@
       document.getElementById('info').textContent = ''
     }
 
-
     if (debug.sceneInfo && info.connected) {
       let data = Object.assign({}, info)
       delete data.sceneInfo.ecefToLocal
@@ -205,6 +204,9 @@
       let meshMegs = Umbra.getStats().meshMemoryUsed / (1024*1024)
       message += `Texture memory use: ${textureMegs.toFixed(1)} MiB\n`
       message += `Mesh memory use: ${meshMegs.toFixed(1)} MiB\n`
+
+      message += `Texture pipeline use: ${(Umbra.runtime.stats.texturePipelineMemoryUse/1024).toFixed(1)} KiB\n`
+      message += `Mesh pipeline use: ${(Umbra.runtime.stats.meshPipelineMemoryUse/1024).toFixed(1)} KiB\n`
 
       document.getElementById('sceneInfo').textContent = message
     } else {

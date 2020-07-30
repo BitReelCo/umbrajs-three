@@ -29,7 +29,7 @@
       let renderer = new THREE.WebGLRenderer({ canvas })
 
       setStatus('Initializing Umbra')
-      let Umbra = await UmbraRuntime.initWithThreeJS(renderer)
+      let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {workerScriptURL: "../dist/UmbraPlayerWorker.js"})
   
       let umbraScene = Umbra.createScene('key=pubk-6f592e67-5aec-479a-ad9e-46ad4e4fe699&project=745415655&model=745415871')
 

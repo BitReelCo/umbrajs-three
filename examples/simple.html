@@ -25,9 +25,10 @@
 
   // Initialize Umbra library with the given renderer
   let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {
-    workerScriptURL: "../dist/UmbraPlayerWorker.js"
+    workerScriptURL: "../dist/UmbraPlayerWorker.js",
+    numWorkers: 2
   })
-  
+
   const libinfo = Umbra.umbrajs.getLibraryInfo()
   console.log(`Runtime build time: ${libinfo.buildTime}`)
   console.log(`Runtime build hash: ${libinfo.version}`)

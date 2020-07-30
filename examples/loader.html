@@ -24,7 +24,7 @@
   let renderer = new THREE.WebGLRenderer({ canvas })
 
   // Initialize Umbra library with the given renderer
-  let Umbra = await UmbraRuntime.initWithThreeJS(renderer)
+  let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {workerScriptURL: "../dist/UmbraPlayerWorker.js"})
 
   // Create a loader
   let loader = new UmbraRuntime.Loader(Umbra)
