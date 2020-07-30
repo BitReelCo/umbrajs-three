@@ -22,7 +22,7 @@ const commonPlugins = () => [
   eslint({
     include: 'src/*',
   }),
-  babel({ extensions, include: ['src/**/*'] }),
+  babel({ extensions, include: ['src/**/*'], babelHelpers: 'bundled' }),
   copyfiles([
     ['node_modules/@umbra3d/umbrajs/dist/umbra.wasm', 'dist/umbra.wasm'],
     ['node_modules/@umbra3d/umbrajs/dist/UmbraPlayerWorker.wasm', 'dist/UmbraPlayerWorker.wasm'],
