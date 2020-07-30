@@ -1,16 +1,11 @@
 module.exports = {
   env: {
     browser: true,
-    es6: true
+    es6: true,
   },
   parser: '@typescript-eslint/parser',
-  extends: [
-    'plugin:@typescript-eslint/recommended',
-    'eslint-config-prettier'
-  ],
-  plugins: [
-    'eslint-plugin-prettier'
-  ],
+  extends: ['plugin:@typescript-eslint/recommended', 'prettier'],
+  plugins: ['prettier'],
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
@@ -18,13 +13,15 @@ module.exports = {
   rules: {
     'prettier/prettier': 'error',
     '@typescript-eslint/no-empty-interface': 'off',
-    '@typescript-eslint/member-delimiter-style': [2,
+    '@typescript-eslint/member-delimiter-style': [
+      2,
       {
-        'multiline': {
-          'delimiter': 'none',
-          'requireLast': false
+        multiline: {
+          delimiter: 'none',
+          requireLast: false,
         },
-      }],
-    semi: [2, 'never']
+      },
+    ],
+    semi: [2, 'never'],
   },
 }
