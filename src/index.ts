@@ -13,6 +13,8 @@ import {
   View,
   Renderable,
   VertexBuffer,
+  JobHandlers,
+  LibraryConfig,
 } from '@umbra3d/umbrajs'
 import { ThreeFormats } from './ThreeFormats'
 import { PublicLink } from './PublicLink'
@@ -20,6 +22,7 @@ import { SharedFrameState } from './SharedFrameState'
 import { UmbraScene, SceneFactory, MeshDescriptor } from './Scene'
 import { WebGLRenderer } from 'three'
 import { HeapBufferView } from '@umbra3d/umbrajs/dist/Heap'
+import { UserPointer } from '@umbra3d/umbrajs/dist/NativeTypes'
 
 export type UmbraCamera = THREE.Camera & {
   umbraStreamingPosition?: THREE.Vector3
@@ -91,13 +94,16 @@ class UmbrajsThreeInternal implements SceneFactory {
     } else {
       context = (renderer as any).context
     }
+
+    // Query GL Context for supported extenions and fill platform features with that info
     const features = umbrajs.getPlatformFeatures(context)
 
     // Three.js does not support BC5 compressed formats so we manually disable them.
     features.textureSupportMask &= ~TextureSupportFlags.BC5
 
     this.umbrajs = umbrajs
-    this.runtime = umbrajs.createRuntime(features)
+    this.runtime = umbrajs.createRuntime({ features })
+    this.runtime.setHandlers(this.handlers)
     this.renderer = renderer
     this.features = features
 
@@ -243,7 +249,7 @@ class UmbrajsThreeInternal implements SceneFactory {
       const start = performance.now()
       this.runtime.update()
       const updateTook = performance.now() - start
-      this.runtime.loadAssets(this.handlers, timeBudget - updateTook)
+      this.runtime.loadAssets(timeBudget - updateTook)
       this.updateViews()
     }
 
@@ -365,20 +371,19 @@ class UmbrajsThreeInternal implements SceneFactory {
   }
 
   // AssetLoad handlers that create and remove materials, textures, and meshes
-  private handlers = {
-    LoadMaterial: (load: Assets.LoadMaterial) => {
-      const material = load.data
-      material.transparent = load.data.transparent ? true : false
-      load.prepare(this.runtime.addAsset(material))
-      load.finish(Assets.AssetLoadResult.Success)
+  private handlers: JobHandlers = {
+    LoadMaterial: (data: Assets.MaterialData, assetID: UserPointer) => {
+      const material = data
+      material.transparent = data.transparent ? true : false
+      this.runtime.addAsset(assetID, material)
+      return Assets.AssetLoadResult.Success
     },
-    UnloadMaterial: (unload: Assets.Unload) => {
-      this.runtime.removeAsset(unload, unload.data)
-      unload.finish()
+    UnloadMaterial: (asset: any, assetID: UserPointer) => {
+      this.runtime.removeAsset(assetID)
     },
-    LoadTexture: (load: Assets.LoadTexture) => {
-      const info = load.data.info
-      const buffer = load.data.buffer
+    LoadTexture: (data: Assets.TextureData, assetID: UserPointer) => {
+      const info = data.info
+      const buffer = data.buffer
 
       let glformat
 
@@ -389,15 +394,13 @@ class UmbrajsThreeInternal implements SceneFactory {
       if (!glformat) {
         // Add a dummy object for unknown formats. They will appear as a solid black color.
         console.log('Unknown texture format', info.format)
-        load.prepare(this.runtime.addAsset({ isTexture: false }))
-        load.finish(Assets.AssetLoadResult.Success)
-        return
+        this.runtime.addAsset(assetID, { isTexture: false })
+        return Assets.AssetLoadResult.Success
       }
 
       if (!this.canFitInMemory(buffer.size)) {
-        load.finish(Assets.AssetLoadResult.OutOfMemory)
         this.adjustQuality(0.8)
-        return
+        return Assets.AssetLoadResult.OutOfMemory
       }
 
       const tex = this.makeTexture(info, buffer, glformat)
@@ -428,24 +431,23 @@ class UmbrajsThreeInternal implements SceneFactory {
 
       this.textureMemoryUsed += buffer.size
       this.assetSizes.set(tex, buffer.size)
-      load.prepare(this.runtime.addAsset(tex))
-      load.finish(Assets.AssetLoadResult.Success)
+      this.runtime.addAsset(assetID, tex)
+      return Assets.AssetLoadResult.Success
     },
-    UnloadTexture: (unload: Assets.Unload) => {
+    UnloadTexture: (texture: any, assetID: UserPointer) => {
       // Free texture data only if it's not a dummy texture
-      if (unload.data.isTexture) {
-        unload.data.dispose()
+      if (texture.isTexture) {
+        texture.dispose()
       }
 
-      if (this.assetSizes.has(unload.data)) {
-        this.textureMemoryUsed -= this.assetSizes.get(unload.data)
-        this.assetSizes.delete(unload.data)
+      if (this.assetSizes.has(texture)) {
+        this.textureMemoryUsed -= this.assetSizes.get(texture)
+        this.assetSizes.delete(texture)
       }
 
-      this.runtime.removeAsset(unload, unload.data)
-      unload.finish()
+      this.runtime.removeAsset(assetID)
     },
-    LoadMesh: (load: Assets.LoadMesh) => {
+    LoadMesh: (data: Assets.MeshData, assetID: UserPointer) => {
       /**
        * LoadMesh gives us all the vertex data in load.data.buffers.
        * The buffers are only valid during this handler, and the memory will be
@@ -462,7 +464,7 @@ class UmbrajsThreeInternal implements SceneFactory {
 
       let totalSize = 0
       Object.keys(attribs)
-        .map(name => load.data.buffers[name])
+        .map(name => data.buffers[name])
         .forEach(buffer => {
           if (buffer) {
             totalSize += buffer.data.size
@@ -470,19 +472,18 @@ class UmbrajsThreeInternal implements SceneFactory {
         })
 
       if (!this.canFitInMemory(totalSize)) {
-        load.finish(Assets.AssetLoadResult.OutOfMemory)
         this.adjustQuality(0.8)
-        return
+        return Assets.AssetLoadResult.OutOfMemory
       }
 
       const geometry = new THREE.BufferGeometry()
-      const indexArray = load.data.buffers['index'].data.getArray()
+      const indexArray = data.buffers['index'].data.getArray()
       const indices = Array.from(indexArray as any)
       geometry.setIndex(indices as number[])
-      geometry.boundingSphere = makeBoundingSphere(load.data.bounds)
+      geometry.boundingSphere = makeBoundingSphere(data.bounds)
 
       Object.keys(attribs).forEach(name => {
-        const buffer = load.data.buffers[name] as VertexBuffer
+        const buffer = data.buffers[name] as VertexBuffer
 
         if (buffer) {
           const view = buffer.data
@@ -499,27 +500,25 @@ class UmbrajsThreeInternal implements SceneFactory {
         }
       })
 
-      const meshDescriptor: MeshDescriptor = {
+      const mesh: MeshDescriptor = {
         geometry,
-        materialDesc: load.data.material,
+        materialDesc: data.material,
       }
 
       this.meshMemoryUsed += totalSize
-      this.assetSizes.set(meshDescriptor, totalSize)
-      load.prepare(this.runtime.addAsset(meshDescriptor))
-      load.finish(Assets.AssetLoadResult.Success)
+      this.assetSizes.set(mesh, totalSize)
+      this.runtime.addAsset(assetID, mesh)
+      return Assets.AssetLoadResult.Success
     },
-    UnloadMesh: (unload: Assets.Unload) => {
-      const meshDesc = unload.data
-      if (this.assetSizes.has(unload.data)) {
-        this.meshMemoryUsed -= this.assetSizes.get(unload.data)
-        this.assetSizes.delete(unload.data)
+    UnloadMesh: (mesh: any, assetID: UserPointer) => {
+      if (this.assetSizes.has(mesh)) {
+        this.meshMemoryUsed -= this.assetSizes.get(mesh)
+        this.assetSizes.delete(mesh)
       }
-      // Tell Umbra's runtime that this asset doesn't exist anymore and finish the job
-      this.runtime.removeAsset(unload, meshDesc)
+      // Tell Umbra's runtime that this asset doesn't exist anymore
+      this.runtime.removeAsset(assetID)
       // Release three.js's resources
-      meshDesc.geometry.dispose()
-      unload.finish()
+      mesh.geometry.dispose()
     },
   }
 
@@ -573,7 +572,7 @@ class UmbrajsThreeInternal implements SceneFactory {
   }
 }
 
-export function initWithThreeJS(renderer: THREE.WebGLRenderer, userConfig: { wasmURL?: string }) {
+export function initWithThreeJS(renderer: THREE.WebGLRenderer, userConfig: LibraryConfig) {
   if (!renderer) {
     throw new TypeError('"renderer" should be of type THREE.WebGLRenderer')
   }

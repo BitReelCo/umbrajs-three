@@ -10,8 +10,8 @@ function copyfiles(files) {
     buildEnd: () => {
       files.forEach(([from, to]) => {
         fs.copyFileSync(from, to)
-      });
-    }
+      })
+    },
   }
 }
 
@@ -20,12 +20,14 @@ const extensions = ['.js', '.ts']
 const commonPlugins = () => [
   resolve({ extensions }),
   eslint({
-    include: 'src/*'
+    include: 'src/*',
   }),
   babel({ extensions, include: ['src/**/*'] }),
   copyfiles([
-    ['node_modules/@umbra3d/umbrajs/dist/umbra.wasm', 'dist/umbra.wasm']
-  ])
+    ['node_modules/@umbra3d/umbrajs/dist/umbra.wasm', 'dist/umbra.wasm'],
+    ['node_modules/@umbra3d/umbrajs/dist/UmbraPlayerWorker.wasm', 'dist/UmbraPlayerWorker.wasm'],
+    ['node_modules/@umbra3d/umbrajs/dist/UmbraPlayerWorker.js', 'dist/UmbraPlayerWorker.js'],
+  ]),
 ]
 
 const makeOutput = (name, format) => ({
@@ -34,33 +36,30 @@ const makeOutput = (name, format) => ({
   name: 'UmbraRuntime',
   exports: 'named',
   sourcemap: true,
-  globals: { three: 'THREE' }
+  globals: { three: 'THREE' },
 })
 
 const config = [
   {
     input: 'src/index.ts',
     output: [
-        makeOutput(`dist/umbrajs-three.js`, 'umd'),
-        makeOutput(`dist/umbrajs-three.amd.js`, 'amd'),
-        makeOutput(`dist/umbrajs-three.esm.js`, 'esm')
+      makeOutput(`dist/umbrajs-three.js`, 'umd'),
+      makeOutput(`dist/umbrajs-three.amd.js`, 'amd'),
+      makeOutput(`dist/umbrajs-three.esm.js`, 'esm'),
     ],
     external: ['three'],
-    plugins: commonPlugins()
+    plugins: commonPlugins(),
   },
   {
     input: 'src/index.ts',
     output: [
-        makeOutput(`dist/umbrajs-three.min.js`, 'umd'),
-        makeOutput(`dist/umbrajs-three.amd.min.js`, 'amd'),
-        makeOutput(`dist/umbrajs-three.esm.min.js`, 'esm')
+      makeOutput(`dist/umbrajs-three.min.js`, 'umd'),
+      makeOutput(`dist/umbrajs-three.amd.min.js`, 'amd'),
+      makeOutput(`dist/umbrajs-three.esm.min.js`, 'esm'),
     ],
     external: ['three'],
-    plugins: [
-      ...commonPlugins(),
-      terser()
-    ]
-  }
+    plugins: [...commonPlugins(), terser()],
+  },
 ]
 
 module.exports = config
