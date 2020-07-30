@@ -1,5 +1,5 @@
 import * as THREE from './ThreeWrapper';
-import { UmbraInstance } from '@umbra3d/umbrajs';
+import { UmbraInstance, LibraryConfig } from '@umbra3d/umbrajs';
 import { PublicLink } from './PublicLink';
 import { UmbraScene, SceneFactory } from './Scene';
 import { WebGLRenderer } from 'three';
@@ -22,7 +22,7 @@ declare class UmbrajsThreeInternal implements SceneFactory {
     private textureMemoryUsed;
     private meshMemoryUsed;
     private lastQualityLowerFrame;
-    private readonly memoryUsed;
+    private get memoryUsed();
     private umbraScenes;
     private oldState;
     private sharedState;
@@ -67,9 +67,7 @@ declare class UmbrajsThreeInternal implements SceneFactory {
     getStreamingProgress(): number;
     dispose(): void;
 }
-export declare function initWithThreeJS(renderer: THREE.WebGLRenderer, userConfig: {
-    wasmURL?: string;
-}): Promise<UmbrajsThreeInternal>;
+export declare function initWithThreeJS(renderer: THREE.WebGLRenderer, userConfig: LibraryConfig): Promise<UmbrajsThreeInternal>;
 interface UmbrajsThree extends UmbrajsThreeInternal {
 }
 export { UmbraScene as Scene, UmbrajsThree };

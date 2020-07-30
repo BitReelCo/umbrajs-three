@@ -1,51 +1,51 @@
 import { TextureFormat } from '@umbra3d/umbrajs';
 declare const ThreeFormats: {
-    [TextureFormat.RGB24]: {
+    1: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.RGBA32]: {
+    0: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.RGB565]: {
+    39: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.RG8]: {
+    40: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.RG16F]: {
+    41: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.BC1]: {
+    2: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.BC3]: {
+    3: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.ETC1_RGB]: {
+    6: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.ASTC_4X4]: {
+    18: {
         format: any;
         type: any;
         compressed: any;
     };
-    [TextureFormat.PVRTC1_RGB4]: {
+    34: {
         format: any;
         type: any;
         compressed: any;

@@ -1,4 +1,4 @@
-define(['exports', 'three'], function (exports, THREE) { 'use strict';
+define(['module', 'exports', 'three'], function (module, exports, THREE) { 'use strict';
 
   function _typeof(obj) {
     "@babel/helpers - typeof";
@@ -83,7 +83,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
     if (typeof o === "string") return _arrayLikeToArray(o, minLen);
     var n = Object.prototype.toString.call(o).slice(8, -1);
     if (n === "Object" && o.constructor) n = o.constructor.name;
-    if (n === "Map" || n === "Set") return Array.from(n);
+    if (n === "Map" || n === "Set") return Array.from(o);
     if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen);
   }
 
@@ -153,115 +153,118 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
   }
 
   var UmbraNativeAPI = function () {
-    var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
-
+    var _scriptDir = new URL(module.uri, document.baseURI).href;
     return function (UmbraNativeAPI) {
       UmbraNativeAPI = UmbraNativeAPI || {};
       var c;
       c || (c = typeof UmbraNativeAPI !== 'undefined' ? UmbraNativeAPI : {});
-      var aa = {},
-          p;
+      var n = {},
+          r;
 
-      for (p in c) {
-        c.hasOwnProperty(p) && (aa[p] = c[p]);
+      for (r in c) {
+        c.hasOwnProperty(r) && (n[r] = c[r]);
       }
 
-      c.arguments = [];
-      c.thisProgram = "./this.program";
+      var aa = "./this.program";
 
-      c.quit = function (a, b) {
+      function ba(a, b) {
         throw b;
-      };
-
-      c.preRun = [];
-      c.postRun = [];
-      var u = "";
-      document.currentScript && (u = document.currentScript.src);
-      _scriptDir && (u = _scriptDir);
-      0 !== u.indexOf("blob:") ? u = u.substr(0, u.lastIndexOf("/") + 1) : u = "";
-      var ba = c.print || ("undefined" !== typeof console ? console.log.bind(console) : "undefined" !== typeof print ? print : null),
-          v = c.printErr || ("undefined" !== typeof printErr ? printErr : "undefined" !== typeof console && console.warn.bind(console) || ba);
-
-      for (p in aa) {
-        aa.hasOwnProperty(p) && (c[p] = aa[p]);
       }
 
-      aa = void 0;
+      var v = "";
+      document.currentScript && (v = document.currentScript.src);
+      _scriptDir && (v = _scriptDir);
+      0 !== v.indexOf("blob:") ? v = v.substr(0, v.lastIndexOf("/") + 1) : v = "";
+      var ca = c.print || console.log.bind(console),
+          w = c.printErr || console.warn.bind(console);
 
-      function ca(a) {
-        da || (da = {});
-        da[a] || (da[a] = 1, v(a));
+      for (r in n) {
+        n.hasOwnProperty(r) && (c[r] = n[r]);
       }
 
-      var da,
-          ea = {
-        "f64-rem": function f64Rem(a, b) {
-          return a % b;
-        },
-        "debugger": function _debugger() {
-          debugger;
-        }
-      };
-      "object" !== (typeof WebAssembly === "undefined" ? "undefined" : _typeof$1(WebAssembly)) && v("no native wasm support detected");
-      var w,
-          x = !1;
+      n = null;
+      c.thisProgram && (aa = c.thisProgram);
+      c.quit && (ba = c.quit);
 
-      function fa(a, b) {
-        a || z("Assertion failed: " + b);
+      function da(a, b) {
+        b || (b = 16);
+        return Math.ceil(a / b) * b;
       }
 
-      function ha(a) {
+      function ea(a) {
+        fa || (fa = {});
+        fa[a] || (fa[a] = 1, w(a));
+      }
+
+      var fa, y;
+      c.wasmBinary && (y = c.wasmBinary);
+      var ha;
+      c.noExitRuntime && (ha = c.noExitRuntime);
+      "object" !== (typeof WebAssembly === "undefined" ? "undefined" : _typeof$1(WebAssembly)) && w("no native wasm support detected");
+      var z,
+          ia = new WebAssembly.Table({
+        initial: 271,
+        maximum: 271,
+        element: "anyfunc"
+      }),
+          A = !1;
+
+      function ja(a, b) {
+        a || B("Assertion failed: " + b);
+      }
+
+      function ka(a) {
         var b = c["_" + a];
-        fa(b, "Cannot call unknown function " + a + ", make sure it is exported");
+        ja(b, "Cannot call unknown function " + a + ", make sure it is exported");
         return b;
       }
 
-      function ia(a, b, d, e) {
+      function la(a, b, d, e) {
         var f = {
           string: function string(a) {
             var b = 0;
 
             if (null !== a && void 0 !== a && 0 !== a) {
               var d = (a.length << 2) + 1;
-              b = ja(d);
-              ka(a, b, d);
+              b = ma(d);
+              na(a, b, d);
             }
 
             return b;
           },
           array: function array(a) {
-            var b = ja(a.length);
-            A.set(a, b);
+            var b = ma(a.length);
+            C.set(a, b);
             return b;
           }
         },
-            g = ha(a),
+            g = ka(a),
             k = [];
         a = 0;
         if (e) for (var h = 0; h < e.length; h++) {
           var l = f[d[h]];
-          l ? (0 === a && (a = la()), k[h] = l(e[h])) : k[h] = e[h];
+          l ? (0 === a && (a = oa()), k[h] = l(e[h])) : k[h] = e[h];
         }
         d = g.apply(null, k);
 
         d = function (a) {
-          return "string" === b ? B(a) : "boolean" === b ? !!a : a;
+          return "string" === b ? D(a) : "boolean" === b ? !!a : a;
         }(d);
 
-        0 !== a && ma(a);
+        0 !== a && pa(a);
         return d;
       }
 
-      var na = "undefined" !== typeof TextDecoder ? new TextDecoder("utf8") : void 0;
+      var qa = "undefined" !== typeof TextDecoder ? new TextDecoder("utf8") : void 0;
 
-      function oa(a, b, d) {
+      function ra(a, b, d) {
         var e = b + d;
 
         for (d = b; a[d] && !(d >= e);) {
           ++d;
         }
 
-        if (16 < d - b && a.subarray && na) return na.decode(a.subarray(b, d));
+        if (16 < d - b && a.subarray && qa) return qa.decode(a.subarray(b, d));
 
         for (e = ""; b < d;) {
           var f = a[b++];
@@ -279,12 +282,12 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return e;
       }
 
-      function B(a) {
-        return a ? oa(C, a, void 0) : "";
+      function D(a) {
+        return a ? ra(_E, a, void 0) : "";
       }
 
-      function ka(a, b, d) {
-        var e = C;
+      function na(a, b, d) {
+        var e = _E;
 
         if (0 < d) {
           d = b + d - 1;
@@ -327,227 +330,174 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
       "undefined" !== typeof TextDecoder && new TextDecoder("utf-16le");
 
-      function pa(a) {
+      function sa(a) {
         0 < a % 65536 && (a += 65536 - a % 65536);
         return a;
       }
 
-      var D, A, C, qa, ra, E, _F, sa, ta;
+      var ta, C, _E, ua, va, F, G, wa, xa;
 
-      function ua() {
-        c.HEAP8 = A = new Int8Array(D);
-        c.HEAP16 = qa = new Int16Array(D);
-        c.HEAP32 = E = new Int32Array(D);
-        c.HEAPU8 = C = new Uint8Array(D);
-        c.HEAPU16 = ra = new Uint16Array(D);
-        c.HEAPU32 = _F = new Uint32Array(D);
-        c.HEAPF32 = sa = new Float32Array(D);
-        c.HEAPF64 = ta = new Float64Array(D);
+      function ya(a) {
+        ta = a;
+        c.HEAP8 = C = new Int8Array(a);
+        c.HEAP16 = ua = new Int16Array(a);
+        c.HEAP32 = F = new Int32Array(a);
+        c.HEAPU8 = _E = new Uint8Array(a);
+        c.HEAPU16 = va = new Uint16Array(a);
+        c.HEAPU32 = G = new Uint32Array(a);
+        c.HEAPF32 = wa = new Float32Array(a);
+        c.HEAPF64 = xa = new Float64Array(a);
       }
 
-      var va = c.TOTAL_MEMORY || 134217728;
-      5242880 > va && v("TOTAL_MEMORY should be larger than TOTAL_STACK, was " + va + "! (TOTAL_STACK=5242880)");
-      c.wasmMemory ? w = c.wasmMemory : w = new WebAssembly.Memory({
-        initial: va / 65536
+      var Aa = c.TOTAL_MEMORY || 134217728;
+      c.wasmMemory ? z = c.wasmMemory : z = new WebAssembly.Memory({
+        initial: Aa / 65536
       });
-      w && (D = w.buffer);
-      va = D.byteLength;
-      ua();
-      E[4356] = 5260336;
+      z && (ta = z.buffer);
+      Aa = ta.byteLength;
+      ya(ta);
+      F[6668] = 5269712;
 
-      function wa(a) {
+      function Ba(a) {
         for (; 0 < a.length;) {
           var b = a.shift();
           if ("function" == typeof b) b();else {
-            var d = b.Sb;
-            "number" === typeof d ? void 0 === b.Pb ? c.dynCall_v(d) : c.dynCall_vi(d, b.Pb) : d(void 0 === b.Pb ? null : b.Pb);
+            var d = b.Ob;
+            "number" === typeof d ? void 0 === b.Lb ? c.dynCall_v(d) : c.dynCall_vi(d, b.Lb) : d(void 0 === b.Lb ? null : b.Lb);
           }
         }
       }
 
-      var xa = [],
-          za = [],
-          Aa = [],
-          Ba = [],
-          Ca = [];
+      var Ca = [],
+          Da = [],
+          Ea = [],
+          Fa = [],
+          Ga = [];
 
-      function Da() {
+      function Ha() {
         var a = c.preRun.shift();
-        xa.unshift(a);
+        Ca.unshift(a);
       }
 
-      var G = 0,
-          Fa = null;
+      var H = 0,
+          Ja = null;
       c.preloadedImages = {};
       c.preloadedAudios = {};
 
-      function Ga() {
-        var a = H;
+      function B(a) {
+        if (c.onAbort) c.onAbort(a);
+        ca(a);
+        w(a);
+        A = !0;
+        throw new WebAssembly.RuntimeError("abort(" + a + "). Build with -s ASSERTIONS=1 for more info.");
+      }
+
+      function Ka() {
+        var a = I;
         return String.prototype.startsWith ? a.startsWith("data:application/octet-stream;base64,") : 0 === a.indexOf("data:application/octet-stream;base64,");
       }
 
-      var H = "umbra.wasm";
+      var I = "umbra.wasm";
 
-      if (!Ga()) {
-        var Ha = H;
-        H = c.locateFile ? c.locateFile(Ha, u) : u + Ha;
+      if (!Ka()) {
+        var La = I;
+        I = c.locateFile ? c.locateFile(La, v) : v + La;
       }
 
-      function Ia() {
+      function Ma() {
         try {
-          if (c.wasmBinary) return new Uint8Array(c.wasmBinary);
+          if (y) return new Uint8Array(y);
           throw "both async and sync fetching of the wasm failed";
         } catch (a) {
-          z(a);
+          B(a);
         }
       }
 
-      function Ja() {
-        return c.wasmBinary || "function" !== typeof fetch ? new Promise(function (a) {
-          a(Ia());
-        }) : fetch(H, {
+      function Na() {
+        return y || "function" !== typeof fetch ? new Promise(function (a) {
+          a(Ma());
+        }) : fetch(I, {
           credentials: "same-origin"
         }).then(function (a) {
-          if (!a.ok) throw "failed to load wasm binary file at '" + H + "'";
+          if (!a.ok) throw "failed to load wasm binary file at '" + I + "'";
           return a.arrayBuffer();
         })["catch"](function () {
-          return Ia();
+          return Ma();
         });
       }
 
-      function Ka(a) {
-        function b(a) {
-          c.asm = a.exports;
-          G--;
-          c.monitorRunDependencies && c.monitorRunDependencies(G);
-          0 == G && (Fa && (a = Fa, Fa = null, a()));
+      var Pa = {
+        5793: function _() {
+          alert("Uploads are not supported.");
+        },
+        7093: function _() {
+          alert("Invalid http method.");
+        },
+        7313: function _(a, b, d, e, f, g, k, h, l, p, u) {
+          return Oa(a, b, d, e, f, g, k, h, l, p, u);
         }
-
-        function d(a) {
-          b(a.instance);
-        }
-
-        function e(a) {
-          return Ja().then(function (a) {
-            return WebAssembly.instantiate(a, f);
-          }).then(a, function (a) {
-            v("failed to asynchronously prepare wasm: " + a);
-            z(a);
-          });
-        }
-
-        var f = {
-          env: a,
-          global: {
-            NaN: NaN,
-            Infinity: Infinity
-          },
-          "global.Math": Math,
-          asm2wasm: ea
-        };
-        G++;
-        c.monitorRunDependencies && c.monitorRunDependencies(G);
-        if (c.instantiateWasm) try {
-          return c.instantiateWasm(f, b);
-        } catch (g) {
-          return v("Module.instantiateWasm callback failed with error: " + g), !1;
-        }
-
-        (function () {
-          if (c.wasmBinary || "function" !== typeof WebAssembly.instantiateStreaming || Ga() || "function" !== typeof fetch) return e(d);
-          fetch(H, {
-            credentials: "same-origin"
-          }).then(function (a) {
-            return WebAssembly.instantiateStreaming(a, f).then(d, function (a) {
-              v("wasm streaming compile failed: " + a);
-              v("falling back to ArrayBuffer instantiation");
-              e(d);
-            });
-          });
-        })();
-
-        return {};
-      }
-
-      c.asm = function (a, b) {
-        b.memory = w;
-        b.table = new WebAssembly.Table({
-          initial: 357,
-          maximum: 357,
-          element: "anyfunc"
-        });
-        b.__memory_base = 1024;
-        b.__table_base = 0;
-        return Ka(b);
-      };
-
-      var Ma = [function () {
-        alert("Invalid http method.");
-      }, function (a, b, d, e, f, g, k, h, l, m, t) {
-        return La(a, b, d, e, f, g, k, h, l, m, t);
-      }, function () {
-        alert("Uploads are not supported.");
-      }];
-      za.push({
-        Sb: function Sb() {
-          Na();
+      },
+          Qa = [];
+      Da.push({
+        Ob: function Ob() {
+          Ra();
         }
       });
 
-      function Oa(a, b) {
-        Ba.unshift({
-          Sb: a,
-          Pb: b
+      function Sa(a, b) {
+        Fa.unshift({
+          Ob: a,
+          Lb: b
         });
       }
 
-      var Pa = [null, [], []];
+      var Ta = [null, [], []];
 
-      function Qa(a, b) {
-        var d = Pa[a];
-        0 === b || 10 === b ? ((1 === a ? ba : v)(oa(d, 0)), d.length = 0) : d.push(b);
+      function Ua(a, b) {
+        var d = Ta[a];
+        0 === b || 10 === b ? ((1 === a ? ca : w)(ra(d, 0)), d.length = 0) : d.push(b);
       }
 
-      var _I = 0;
+      var J = 0;
 
-      function J() {
-        _I += 4;
-        return E[_I - 4 >> 2];
+      function Va() {
+        J += 4;
+        return F[J - 4 >> 2];
       }
 
-      var Ra = {},
-          Sa = {};
+      var Wa = {},
+          Xa = {};
 
-      function Ta(a) {
+      function Ya(a) {
         for (; a.length;) {
           var b = a.pop();
           a.pop()(b);
         }
       }
 
-      function Ua(a) {
-        return this.fromWireType(_F[a >> 2]);
+      function Za(a) {
+        return this.fromWireType(G[a >> 2]);
       }
 
       var K = {},
           L = {},
-          Va = {};
+          $a = {};
 
-      function Wa(a) {
+      function ab(a) {
         if (void 0 === a) return "_unknown";
         a = a.replace(/[^a-zA-Z0-9_]/g, "$");
         var b = a.charCodeAt(0);
         return 48 <= b && 57 >= b ? "_" + a : a;
       }
 
-      function Xa(a, b) {
-        a = Wa(a);
+      function bb(a, b) {
+        a = ab(a);
         return new Function("body", "return function " + a + '() {\n    "use strict";    return body.apply(this, arguments);\n};\n')(b);
       }
 
-      function Ya(a) {
+      function cb(a) {
         var b = Error,
-            d = Xa(a, function (b) {
+            d = bb(a, function (b) {
           this.name = a;
           this.message = b;
           b = Error(b).stack;
@@ -563,12 +513,12 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return d;
       }
 
-      var Za = void 0;
+      var db = void 0;
 
-      function $a(a, b, d) {
+      function eb(a, b, d) {
         function e(b) {
           b = d(b);
-          if (b.length !== a.length) throw new Za("Mismatched type converter count");
+          if (b.length !== a.length) throw new db("Mismatched type converter count");
 
           for (var e = 0; e < a.length; ++e) {
             M(a[e], b[e]);
@@ -576,7 +526,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }
 
         a.forEach(function (a) {
-          Va[a] = b;
+          $a[a] = b;
         });
         var f = Array(b.length),
             g = [],
@@ -591,7 +541,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         0 === g.length && e(f);
       }
 
-      function ab(a) {
+      function fb(a) {
         switch (a) {
           case 1:
             return 0;
@@ -610,42 +560,42 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }
       }
 
-      var bb = void 0;
+      var gb = void 0;
 
       function N(a) {
-        for (var b = ""; C[a];) {
-          b += bb[C[a++]];
+        for (var b = ""; _E[a];) {
+          b += gb[_E[a++]];
         }
 
         return b;
       }
 
-      var cb = void 0;
+      var hb = void 0;
 
-      function O(a) {
-        throw new cb(a);
+      function P(a) {
+        throw new hb(a);
       }
 
       function M(a, b, d) {
         d = d || {};
         if (!("argPackAdvance" in b)) throw new TypeError("registerType registeredInstance requires argPackAdvance");
         var e = b.name;
-        a || O('type "' + e + '" must have a positive integer typeid pointer');
+        a || P('type "' + e + '" must have a positive integer typeid pointer');
 
         if (L.hasOwnProperty(a)) {
-          if (d.cc) return;
-          O("Cannot register type '" + e + "' twice");
+          if (d.Yb) return;
+          P("Cannot register type '" + e + "' twice");
         }
 
         L[a] = b;
-        delete Va[a];
+        delete $a[a];
         K.hasOwnProperty(a) && (b = K[a], delete K[a], b.forEach(function (a) {
           a();
         }));
       }
 
-      var db = [],
-          P = [{}, {
+      var ib = [],
+          Q = [{}, {
         value: void 0
       }, {
         value: null
@@ -655,8 +605,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         value: !1
       }];
 
-      function eb(a) {
-        4 < a && 0 === --P[a].Tb && (P[a] = void 0, db.push(a));
+      function jb(a) {
+        4 < a && 0 === --Q[a].Pb && (Q[a] = void 0, ib.push(a));
       }
 
       function R(a) {
@@ -674,16 +624,16 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
             return 4;
 
           default:
-            var b = db.length ? db.pop() : P.length;
-            P[b] = {
-              Tb: 1,
+            var b = ib.length ? ib.pop() : Q.length;
+            Q[b] = {
+              Pb: 1,
               value: a
             };
             return b;
         }
       }
 
-      function fb(a) {
+      function kb(a) {
         if (null === a) return "null";
 
         var b = _typeof$1(a);
@@ -691,16 +641,16 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return "object" === b || "array" === b || "function" === b ? a.toString() : "" + a;
       }
 
-      function gb(a, b) {
+      function lb(a, b) {
         switch (b) {
           case 2:
             return function (a) {
-              return this.fromWireType(sa[a >> 2]);
+              return this.fromWireType(wa[a >> 2]);
             };
 
           case 3:
             return function (a) {
-              return this.fromWireType(ta[a >> 3]);
+              return this.fromWireType(xa[a >> 3]);
             };
 
           default:
@@ -708,49 +658,49 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }
       }
 
-      function hb(a) {
+      function mb(a) {
         var b = Function;
         if (!(b instanceof Function)) throw new TypeError("new_ called with constructor type " + _typeof$1(b) + " which is not a function");
-        var d = Xa(b.name || "unknownFunctionName", function () {});
+        var d = bb(b.name || "unknownFunctionName", function () {});
         d.prototype = b.prototype;
         d = new d();
         a = b.apply(d, a);
         return a instanceof Object ? a : d;
       }
 
-      function ib(a, b) {
+      function nb(a, b) {
         var d = c;
 
-        if (void 0 === d[a].Nb) {
+        if (void 0 === d[a].Jb) {
           var e = d[a];
 
           d[a] = function () {
-            d[a].Nb.hasOwnProperty(arguments.length) || O("Function '" + b + "' called with an invalid number of arguments (" + arguments.length + ") - expects one of (" + d[a].Nb + ")!");
-            return d[a].Nb[arguments.length].apply(this, arguments);
+            d[a].Jb.hasOwnProperty(arguments.length) || P("Function '" + b + "' called with an invalid number of arguments (" + arguments.length + ") - expects one of (" + d[a].Jb + ")!");
+            return d[a].Jb[arguments.length].apply(this, arguments);
           };
 
-          d[a].Nb = [];
-          d[a].Nb[e.Xb] = e;
+          d[a].Jb = [];
+          d[a].Jb[e.Sb] = e;
         }
       }
 
-      function jb(a, b, d) {
-        c.hasOwnProperty(a) ? ((void 0 === d || void 0 !== c[a].Nb && void 0 !== c[a].Nb[d]) && O("Cannot register public name '" + a + "' twice"), ib(a, a), c.hasOwnProperty(d) && O("Cannot register multiple overloads of a function with the same number of arguments (" + d + ")!"), c[a].Nb[d] = b) : (c[a] = b, void 0 !== d && (c[a].vc = d));
+      function ob(a, b, d) {
+        c.hasOwnProperty(a) ? ((void 0 === d || void 0 !== c[a].Jb && void 0 !== c[a].Jb[d]) && P("Cannot register public name '" + a + "' twice"), nb(a, a), c.hasOwnProperty(d) && P("Cannot register multiple overloads of a function with the same number of arguments (" + d + ")!"), c[a].Jb[d] = b) : (c[a] = b, void 0 !== d && (c[a].rc = d));
       }
 
-      function kb(a, b) {
+      function pb(a, b) {
         for (var d = [], e = 0; e < a; e++) {
-          d.push(E[(b >> 2) + e]);
+          d.push(F[(b >> 2) + e]);
         }
 
         return d;
       }
 
-      function lb(a, b) {
+      function qb(a, b) {
         a = N(a);
         if (void 0 !== c["FUNCTION_TABLE_" + a]) var d = c["FUNCTION_TABLE_" + a][b];else if ("undefined" !== typeof FUNCTION_TABLE) d = FUNCTION_TABLE[b];else {
           d = c["dynCall_" + a];
-          void 0 === d && (d = c["dynCall_" + a.replace(/f/g, "d")], void 0 === d && O("No dynCall invoker for signature: " + a));
+          void 0 === d && (d = c["dynCall_" + a.replace(/f/g, "d")], void 0 === d && P("No dynCall invoker for signature: " + a));
 
           for (var e = [], f = 1; f < a.length; ++f) {
             e.push("a" + f);
@@ -760,51 +710,51 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           f += "    return dynCall(rawFunction" + (e.length ? ", " : "") + e.join(", ") + ");\n";
           d = new Function("dynCall", "rawFunction", f + "};\n")(d, b);
         }
-        "function" !== typeof d && O("unknown function pointer with signature " + a + ": " + b);
+        "function" !== typeof d && P("unknown function pointer with signature " + a + ": " + b);
         return d;
       }
 
-      var mb = void 0;
+      var rb = void 0;
 
-      function nb(a) {
-        a = ob(a);
+      function sb(a) {
+        a = tb(a);
         var b = N(a);
         S(a);
         return b;
       }
 
-      function pb(a, b) {
+      function ub(a, b) {
         function d(a) {
-          f[a] || L[a] || (Va[a] ? Va[a].forEach(d) : (e.push(a), f[a] = !0));
+          f[a] || L[a] || ($a[a] ? $a[a].forEach(d) : (e.push(a), f[a] = !0));
         }
 
         var e = [],
             f = {};
         b.forEach(d);
-        throw new mb(a + ": " + e.map(nb).join([", "]));
+        throw new rb(a + ": " + e.map(sb).join([", "]));
       }
 
-      function qb(a, b, d) {
+      function vb(a, b, d) {
         switch (b) {
           case 0:
             return d ? function (a) {
-              return A[a];
-            } : function (a) {
               return C[a];
+            } : function (a) {
+              return _E[a];
             };
 
           case 1:
             return d ? function (a) {
-              return qa[a >> 1];
+              return ua[a >> 1];
             } : function (a) {
-              return ra[a >> 1];
+              return va[a >> 1];
             };
 
           case 2:
             return d ? function (a) {
-              return E[a >> 2];
+              return F[a >> 2];
             } : function (a) {
-              return _F[a >> 2];
+              return G[a >> 2];
             };
 
           default:
@@ -813,48 +763,48 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
       }
 
       function T(a) {
-        a || O("Cannot use deleted val. handle = " + a);
-        return P[a].value;
-      }
-
-      function rb(a, b) {
-        var d = L[a];
-        void 0 === d && O(b + " has unknown type " + nb(a));
-        return d;
-      }
-
-      var sb = {};
-
-      function tb(a) {
-        var b = sb[a];
-        return void 0 === b ? N(a) : b;
-      }
-
-      var ub = [];
-
-      function vb(a) {
-        var b = ub.length;
-        ub.push(a);
-        return b;
+        a || P("Cannot use deleted val. handle = " + a);
+        return Q[a].value;
       }
 
       function wb(a, b) {
+        var d = L[a];
+        void 0 === d && P(b + " has unknown type " + sb(a));
+        return d;
+      }
+
+      var xb = {};
+
+      function yb(a) {
+        var b = xb[a];
+        return void 0 === b ? N(a) : b;
+      }
+
+      var zb = [];
+
+      function Ab(a) {
+        var b = zb.length;
+        zb.push(a);
+        return b;
+      }
+
+      function Bb(a, b) {
         for (var d = Array(a), e = 0; e < a; ++e) {
-          d[e] = rb(E[(b >> 2) + e], "parameter " + e);
+          d[e] = wb(F[(b >> 2) + e], "parameter " + e);
         }
 
         return d;
       }
 
-      function xb(a, b) {
-        yb = a;
-        zb = b;
-        if (Ab) if (0 == a) U = function U() {
-          var a = Math.max(0, Bb + b - V()) | 0;
-          setTimeout(_Cb, a);
-        }, Db = "timeout";else if (1 == a) U = function U() {
-          Eb(_Cb);
-        }, Db = "rAF";else if (2 == a) {
+      function Cb(a, b) {
+        Db = a;
+        Eb = b;
+        if (Fb) if (0 == a) U = function U() {
+          var a = Math.max(0, Gb + b - V()) | 0;
+          setTimeout(_Hb, a);
+        }, Ib = "timeout";else if (1 == a) U = function U() {
+          Jb(_Hb);
+        }, Ib = "rAF";else if (2 == a) {
           if ("undefined" === typeof setImmediate) {
             var d = [];
             addEventListener("message", function (a) {
@@ -868,23 +818,23 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           }
 
           U = function U() {
-            setImmediate(_Cb);
+            setImmediate(_Hb);
           };
 
-          Db = "immediate";
+          Ib = "immediate";
         }
       }
 
       function V() {
-        z();
+        B();
       }
 
-      function Fb(a) {
-        var b = Gb;
-        c.noExitRuntime = !0;
-        fa(!Ab, "emscripten_set_main_loop: there can only be one main loop function at once: call emscripten_cancel_main_loop to cancel the previous one before setting a new one with different parameters.");
-        Ab = a;
-        Gb = b;
+      function Kb(a) {
+        var b = Lb;
+        ha = !0;
+        ja(!Fb, "emscripten_set_main_loop: there can only be one main loop function at once: call emscripten_cancel_main_loop to cancel the previous one before setting a new one with different parameters.");
+        Fb = a;
+        Lb = b;
         var d = "undefined" !== typeof b ? function () {
           c.dynCall_vi(a, b);
         } : function () {
@@ -892,103 +842,103 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         };
         var e = W;
 
-        _Cb = function Cb() {
-          if (!x) if (0 < Hb.length) {
+        _Hb = function Hb() {
+          if (!A) if (0 < Mb.length) {
             var a = Date.now(),
-                b = Hb.shift();
-            b.Sb(b.Pb);
+                b = Mb.shift();
+            b.Ob(b.Lb);
 
             if (false) {
               var k;
             }
 
             console.log('main loop blocker "' + b.name + '" took ' + (Date.now() - a) + " ms");
-            c.setStatus && (a = c.statusMessage || "Please wait...", b = Ib, k = Jb.qc, b ? b < k ? c.setStatus(a + " (" + (k - b) + "/" + k + ")") : c.setStatus(a) : c.setStatus(""));
-            e < W || setTimeout(_Cb, 0);
-          } else if (!(e < W)) if (Kb = Kb + 1 | 0, 1 == yb && 1 < zb && 0 != Kb % zb) U();else {
-            0 == yb && (Bb = V());
-            "timeout" === Db && c.Rb && (v("Looks like you are rendering without using requestAnimationFrame for the main loop. You should use 0 for the frame rate in emscripten_set_main_loop in order to use requestAnimationFrame, as that can greatly improve your frame rates!"), Db = "");
+            c.setStatus && (a = c.statusMessage || "Please wait...", b = Nb, k = Ob.lc, b ? b < k ? c.setStatus(a + " (" + (k - b) + "/" + k + ")") : c.setStatus(a) : c.setStatus(""));
+            e < W || setTimeout(_Hb, 0);
+          } else if (!(e < W)) if (Pb = Pb + 1 | 0, 1 == Db && 1 < Eb && 0 != Pb % Eb) U();else {
+            0 == Db && (Gb = V());
+            "timeout" === Ib && c.Mb && (w("Looks like you are rendering without using requestAnimationFrame for the main loop. You should use 0 for the frame rate in emscripten_set_main_loop in order to use requestAnimationFrame, as that can greatly improve your frame rates!"), Ib = "");
 
-            a: if (!(x || c.preMainLoop && !1 === c.preMainLoop())) {
+            a: if (!(A || c.preMainLoop && !1 === c.preMainLoop())) {
               try {
                 d();
               } catch (l) {
-                if (l instanceof Lb) break a;
-                l && "object" === _typeof$1(l) && l.stack && v("exception thrown: " + [l, l.stack]);
+                if (l instanceof Qb) break a;
+                l && "object" === _typeof$1(l) && l.stack && w("exception thrown: " + [l, l.stack]);
                 throw l;
               }
 
               c.postMainLoop && c.postMainLoop();
             }
 
-            e < W || ("object" === (typeof SDL === "undefined" ? "undefined" : _typeof$1(SDL)) && SDL.audio && SDL.audio.ec && SDL.audio.ec(), U());
+            e < W || ("object" === (typeof SDL === "undefined" ? "undefined" : _typeof$1(SDL)) && SDL.audio && SDL.audio.$b && SDL.audio.$b(), U());
           }
         };
       }
 
       var U = null,
-          Db = "",
+          Ib = "",
           W = 0,
-          Ab = null,
-          Gb = 0,
-          yb = 0,
-          zb = 0,
-          Kb = 0,
-          Hb = [],
-          Jb = {},
-          Bb,
-          _Cb,
-          Ib,
-          Nb = !1,
-          Ob = !1,
-          Pb = [];
+          Fb = null,
+          Lb = 0,
+          Db = 0,
+          Eb = 0,
+          Pb = 0,
+          Mb = [],
+          Ob = {},
+          Gb,
+          _Hb,
+          Nb,
+          Rb = !1,
+          Sb = !1,
+          Tb = [];
 
-      function Qb() {
+      function Vb() {
         function a() {
-          Ob = document.pointerLockElement === c.canvas || document.mozPointerLockElement === c.canvas || document.webkitPointerLockElement === c.canvas || document.msPointerLockElement === c.canvas;
+          Sb = document.pointerLockElement === c.canvas || document.mozPointerLockElement === c.canvas || document.webkitPointerLockElement === c.canvas || document.msPointerLockElement === c.canvas;
         }
 
         c.preloadPlugins || (c.preloadPlugins = []);
 
-        if (!Rb) {
-          Rb = !0;
+        if (!Wb) {
+          Wb = !0;
 
           try {
-            Sb = !0;
+            Xb = !0;
           } catch (d) {
-            Sb = !1, console.log("warning: no blob constructor, cannot create blobs with mimetypes");
+            Xb = !1, console.log("warning: no blob constructor, cannot create blobs with mimetypes");
           }
 
-          Tb = "undefined" != typeof MozBlobBuilder ? MozBlobBuilder : "undefined" != typeof WebKitBlobBuilder ? WebKitBlobBuilder : Sb ? null : console.log("warning: no BlobBuilder");
-          Ub = "undefined" != typeof window ? window.URL ? window.URL : window.webkitURL : void 0;
-          c.Wb || "undefined" !== typeof Ub || (console.log("warning: Browser does not support creating object URLs. Built-in browser image decoding will not be available."), c.Wb = !0);
+          Yb = "undefined" != typeof MozBlobBuilder ? MozBlobBuilder : "undefined" != typeof WebKitBlobBuilder ? WebKitBlobBuilder : Xb ? null : console.log("warning: no BlobBuilder");
+          Zb = "undefined" != typeof window ? window.URL ? window.URL : window.webkitURL : void 0;
+          c.Rb || "undefined" !== typeof Zb || (console.log("warning: Browser does not support creating object URLs. Built-in browser image decoding will not be available."), c.Rb = !0);
           c.preloadPlugins.push({
             canHandle: function canHandle(a) {
-              return !c.Wb && /\.(jpg|jpeg|png|bmp)$/i.test(a);
+              return !c.Rb && /\.(jpg|jpeg|png|bmp)$/i.test(a);
             },
             handle: function handle(a, b, f, g) {
               var d = null;
-              if (Sb) try {
+              if (Xb) try {
                 d = new Blob([a], {
-                  type: Vb(b)
+                  type: $b(b)
                 }), d.size !== a.length && (d = new Blob([new Uint8Array(a).buffer], {
-                  type: Vb(b)
+                  type: $b(b)
                 }));
-              } catch (m) {
-                ca("Blob constructor present but fails: " + m + "; falling back to blob builder");
+              } catch (p) {
+                ea("Blob constructor present but fails: " + p + "; falling back to blob builder");
               }
-              d || (d = new Tb(), d.append(new Uint8Array(a).buffer), d = d.getBlob());
-              var e = Ub.createObjectURL(d),
+              d || (d = new Yb(), d.append(new Uint8Array(a).buffer), d = d.getBlob());
+              var e = Zb.createObjectURL(d),
                   l = new Image();
 
               l.onload = function () {
-                fa(l.complete, "Image " + b + " could not be decoded");
+                ja(l.complete, "Image " + b + " could not be decoded");
                 var d = document.createElement("canvas");
                 d.width = l.width;
                 d.height = l.height;
                 d.getContext("2d").drawImage(l, 0, 0);
                 c.preloadedImages[b] = d;
-                Ub.revokeObjectURL(e);
+                Zb.revokeObjectURL(e);
                 f && f(a);
               };
 
@@ -1002,7 +952,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           });
           c.preloadPlugins.push({
             canHandle: function canHandle(a) {
-              return !c.uc && a.substr(-4) in {
+              return !c.qc && a.substr(-4) in {
                 ".ogg": 1,
                 ".wav": 1,
                 ".mp3": 1
@@ -1019,22 +969,22 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
               var l = !1;
 
-              if (Sb) {
+              if (Xb) {
                 try {
-                  var m = new Blob([a], {
-                    type: Vb(b)
+                  var p = new Blob([a], {
+                    type: $b(b)
                   });
                 } catch (q) {
                   return e();
                 }
 
-                m = Ub.createObjectURL(m);
-                var t = new Audio();
-                t.addEventListener("canplaythrough", function () {
-                  d(t);
+                p = Zb.createObjectURL(p);
+                var u = new Audio();
+                u.addEventListener("canplaythrough", function () {
+                  d(u);
                 }, !1);
 
-                t.onerror = function () {
+                u.onerror = function () {
                   if (!l) {
                     console.log("warning: browser could not fully decode audio " + b + ", trying slower base64 approach");
 
@@ -1047,67 +997,67 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
                     }
 
                     2 == g ? (e += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[(f & 3) << 4], e += "==") : 4 == g && (e += "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[(f & 15) << 2], e += "=");
-                    t.src = "data:audio/x-" + b.substr(-3) + ";base64," + e;
-                    d(t);
+                    u.src = "data:audio/x-" + b.substr(-3) + ";base64," + e;
+                    d(u);
                   }
                 };
 
-                t.src = m;
-                Wb(function () {
-                  d(t);
+                u.src = p;
+                ac(function () {
+                  d(u);
                 });
               } else return e();
             }
           });
           var b = c.canvas;
           b && (b.requestPointerLock = b.requestPointerLock || b.mozRequestPointerLock || b.webkitRequestPointerLock || b.msRequestPointerLock || function () {}, b.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock || document.webkitExitPointerLock || document.msExitPointerLock || function () {}, b.exitPointerLock = b.exitPointerLock.bind(document), document.addEventListener("pointerlockchange", a, !1), document.addEventListener("mozpointerlockchange", a, !1), document.addEventListener("webkitpointerlockchange", a, !1), document.addEventListener("mspointerlockchange", a, !1), c.elementPointerLock && b.addEventListener("click", function (a) {
-            !Ob && c.canvas.requestPointerLock && (c.canvas.requestPointerLock(), a.preventDefault());
+            !Sb && c.canvas.requestPointerLock && (c.canvas.requestPointerLock(), a.preventDefault());
           }, !1));
         }
       }
 
-      function Xb(a, b, d, e) {
-        if (b && c.Rb && a == c.canvas) return c.Rb;
+      function bc(a, b, d, e) {
+        if (b && c.Mb && a == c.canvas) return c.Mb;
         var f;
 
         if (b) {
           var g = {
             antialias: !1,
             alpha: !1,
-            sc: 1
+            oc: 1
           };
           if (e) for (var k in e) {
             g[k] = e[k];
           }
-          if ("undefined" !== typeof GL && (f = GL.nc(a, g))) var h = GL.getContext(f).lc;
+          if ("undefined" !== typeof GL && (f = GL.ic(a, g))) var h = GL.getContext(f).gc;
         } else h = a.getContext("2d");
 
         if (!h) return null;
-        d && (b || fa("undefined" === typeof GLctx, "cannot set in module if GLctx is used, but we are a non-GL context that would replace it"), c.Rb = h, b && GL.tc(f), c.wc = b, Pb.forEach(function (a) {
+        d && (b || ja("undefined" === typeof GLctx, "cannot set in module if GLctx is used, but we are a non-GL context that would replace it"), c.Mb = h, b && GL.pc(f), c.sc = b, Tb.forEach(function (a) {
           a();
-        }), Qb());
+        }), Vb());
         return h;
       }
 
-      var Yb = !1,
-          Zb = void 0,
-          X = void 0;
+      var cc = !1,
+          dc = void 0,
+          Y = void 0;
 
-      function $b(a, b, d) {
+      function ec(a, b, d) {
         function e() {
-          Nb = !1;
+          Rb = !1;
           var a = f.parentNode;
-          (document.fullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement) === a ? (f.exitFullscreen = ac, Zb && f.requestPointerLock(), Nb = !0, X ? ("undefined" != typeof SDL && (E[SDL.screen >> 2] = _F[SDL.screen >> 2] | 8388608), bc(c.canvas), cc()) : bc(f)) : (a.parentNode.insertBefore(f, a), a.parentNode.removeChild(a), X ? ("undefined" != typeof SDL && (E[SDL.screen >> 2] = _F[SDL.screen >> 2] & -8388609), bc(c.canvas), cc()) : bc(f));
-          if (c.onFullScreen) c.onFullScreen(Nb);
-          if (c.onFullscreen) c.onFullscreen(Nb);
+          (document.fullscreenElement || document.mozFullScreenElement || document.msFullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement) === a ? (f.exitFullscreen = fc, dc && f.requestPointerLock(), Rb = !0, Y ? ("undefined" != typeof SDL && (F[SDL.screen >> 2] = G[SDL.screen >> 2] | 8388608), gc(c.canvas), hc()) : gc(f)) : (a.parentNode.insertBefore(f, a), a.parentNode.removeChild(a), Y ? ("undefined" != typeof SDL && (F[SDL.screen >> 2] = G[SDL.screen >> 2] & -8388609), gc(c.canvas), hc()) : gc(f));
+          if (c.onFullScreen) c.onFullScreen(Rb);
+          if (c.onFullscreen) c.onFullscreen(Rb);
         }
 
-        Zb = a;
-        X = b;
-        "undefined" === typeof Zb && (Zb = !0);
-        "undefined" === typeof X && (X = !1);
+        dc = a;
+        Y = b;
+        "undefined" === typeof dc && (dc = !0);
+        "undefined" === typeof Y && (Y = !1);
         var f = c.canvas;
-        Yb || (Yb = !0, document.addEventListener("fullscreenchange", e, !1), document.addEventListener("mozfullscreenchange", e, !1), document.addEventListener("webkitfullscreenchange", e, !1), document.addEventListener("MSFullscreenChange", e, !1));
+        cc || (cc = !0, document.addEventListener("fullscreenchange", e, !1), document.addEventListener("mozfullscreenchange", e, !1), document.addEventListener("webkitfullscreenchange", e, !1), document.addEventListener("MSFullscreenChange", e, !1));
         var g = document.createElement("div");
         f.parentNode.insertBefore(g, f);
         g.appendChild(f);
@@ -1117,46 +1067,46 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           g.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
         } : null);
         d ? g.requestFullscreen({
-          xc: d
+          tc: d
         }) : g.requestFullscreen();
       }
 
-      function ec(a, b, d) {
-        v("Browser.requestFullScreen() is deprecated. Please call Browser.requestFullscreen instead.");
+      function jc(a, b, d) {
+        w("Browser.requestFullScreen() is deprecated. Please call Browser.requestFullscreen instead.");
 
-        ec = function ec(a, b, d) {
-          $b(a, b, d);
+        jc = function jc(a, b, d) {
+          ec(a, b, d);
         };
 
-        $b(a, b, d);
+        ec(a, b, d);
       }
 
-      function ac() {
-        if (!Nb) return !1;
+      function fc() {
+        if (!Rb) return !1;
         (document.exitFullscreen || document.cancelFullScreen || document.mozCancelFullScreen || document.msExitFullscreen || document.webkitCancelFullScreen || function () {}).apply(document, []);
         return !0;
       }
 
-      var fc = 0;
+      var kc = 0;
 
-      function Eb(a) {
+      function Jb(a) {
         if ("function" === typeof requestAnimationFrame) requestAnimationFrame(a);else {
           var b = Date.now();
-          if (0 === fc) fc = b + 1E3 / 60;else for (; b + 2 >= fc;) {
-            fc += 1E3 / 60;
+          if (0 === kc) kc = b + 1E3 / 60;else for (; b + 2 >= kc;) {
+            kc += 1E3 / 60;
           }
-          setTimeout(a, Math.max(fc - b, 0));
+          setTimeout(a, Math.max(kc - b, 0));
         }
       }
 
-      function Wb(a) {
-        c.noExitRuntime = !0;
+      function ac(a) {
+        ha = !0;
         setTimeout(function () {
-          x || a();
+          A || a();
         }, 1E4);
       }
 
-      function Vb(a) {
+      function $b(a) {
         return {
           jpg: "image/jpeg",
           jpeg: "image/jpeg",
@@ -1168,17 +1118,17 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }[a.substr(a.lastIndexOf(".") + 1)];
       }
 
-      var gc = [];
+      var lc = [];
 
-      function cc() {
+      function hc() {
         var a = c.canvas;
-        gc.forEach(function (b) {
+        lc.forEach(function (b) {
           b(a.width, a.height);
         });
       }
 
-      function bc(a, b, d) {
-        b && d ? (a.kc = b, a.bc = d) : (b = a.kc, d = a.bc);
+      function gc(a, b, d) {
+        b && d ? (a.fc = b, a.Xb = d) : (b = a.fc, d = a.Xb);
         var e = b,
             f = d;
         c.forcedAspectRatio && 0 < c.forcedAspectRatio && (e / f < c.forcedAspectRatio ? e = Math.round(f * c.forcedAspectRatio) : f = Math.round(e / c.forcedAspectRatio));
@@ -1189,39 +1139,35 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           f = Math.round(f * g);
         }
 
-        X ? (a.width != e && (a.width = e), a.height != f && (a.height = f), "undefined" != typeof a.style && (a.style.removeProperty("width"), a.style.removeProperty("height"))) : (a.width != b && (a.width = b), a.height != d && (a.height = d), "undefined" != typeof a.style && (e != b || f != d ? (a.style.setProperty("width", e + "px", "important"), a.style.setProperty("height", f + "px", "important")) : (a.style.removeProperty("width"), a.style.removeProperty("height"))));
+        Y ? (a.width != e && (a.width = e), a.height != f && (a.height = f), "undefined" != typeof a.style && (a.style.removeProperty("width"), a.style.removeProperty("height"))) : (a.width != b && (a.width = b), a.height != d && (a.height = d), "undefined" != typeof a.style && (e != b || f != d ? (a.style.setProperty("width", e + "px", "important"), a.style.setProperty("height", f + "px", "important")) : (a.style.removeProperty("width"), a.style.removeProperty("height"))));
       }
 
-      var Y = {},
-          hc = 0;
+      var Z = {},
+          mc = 0;
 
-      function ic() {
-        var a = hc;
-        hc++;
+      function nc() {
+        var a = mc;
+        mc++;
         return a;
       }
 
-      var Rb, Sb, Tb, Ub;
+      var Wb, Xb, Yb, Zb;
 
-      function jc() {
-        return A.length;
-      }
-
-      function kc() {
+      function oc() {
         if ("undefined" !== typeof indexedDB) return indexedDB;
         var a = null;
         "object" === (typeof window === "undefined" ? "undefined" : _typeof$1(window)) && (a = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB);
-        fa(a, "IDBStore used, but indexedDB not supported");
+        ja(a, "IDBStore used, but indexedDB not supported");
         return a;
       }
 
-      var lc = {};
+      var pc = {};
 
-      function mc(a, b) {
-        var d = lc[a];
+      function qc(a, b) {
+        var d = pc[a];
         if (d) b(null, d);else {
           try {
-            var e = kc().open(a, 22);
+            var e = oc().open(a, 22);
           } catch (f) {
             b(f);
             return;
@@ -1235,7 +1181,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
           e.onsuccess = function () {
             d = e.result;
-            lc[a] = d;
+            pc[a] = d;
             b(null, d);
           };
 
@@ -1246,8 +1192,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }
       }
 
-      function nc(a, b, d) {
-        mc(a, function (a, f) {
+      function rc(a, b, d) {
+        qc(a, function (a, f) {
           if (a) return d(a);
           a = f.transaction(["FILE_DATA"], b);
 
@@ -1261,8 +1207,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         });
       }
 
-      function oc(a, b, d) {
-        nc(a, "readonly", function (a, f) {
+      function sc(a, b, d) {
+        rc(a, "readonly", function (a, f) {
           if (a) return d(a);
           a = f.get(b);
 
@@ -1276,8 +1222,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         });
       }
 
-      function pc(a, b, d, e) {
-        nc(a, "readwrite", function (a, g) {
+      function tc(a, b, d, e) {
+        rc(a, "readwrite", function (a, g) {
           if (a) return e(a);
           a = g.put(d, b);
 
@@ -1291,75 +1237,90 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         });
       }
 
-      function qc(a) {
-        if (!c.noExitRuntime && (x = !0, wa(Ba), c.onExit)) c.onExit(a);
-        c.quit(a, new Lb(a));
-      }
+      var uc = {};
 
-      c._exit = qc;
-      ka("GMT", 17328, 4);
+      function vc() {
+        if (!wc) {
+          var a = {
+            USER: "web_user",
+            LOGNAME: "web_user",
+            PATH: "/",
+            PWD: "/",
+            HOME: "/home/web_user",
+            LANG: ("object" === (typeof navigator === "undefined" ? "undefined" : _typeof$1(navigator)) && navigator.languages && navigator.languages[0] || "C").replace("-", "_") + ".UTF-8",
+            _: aa
+          },
+              b;
 
-      function rc(a) {
-        a = pa(a);
-        var b = D.byteLength;
+          for (b in uc) {
+            a[b] = uc[b];
+          }
 
-        try {
-          return -1 !== w.grow((a - b) / 65536) ? (D = w.buffer, !0) : !1;
-        } catch (d) {
-          return !1;
+          var d = [];
+
+          for (b in a) {
+            d.push(b + "=" + a[b]);
+          }
+
+          wc = d;
         }
+
+        return wc;
       }
 
-      Ba.push(function () {
-        var a = c._fflush;
-        a && a(0);
-        Pa[1].length && Qa(1, 10);
-        Pa[2].length && Qa(2, 10);
-      });
-      Za = c.InternalError = Ya("InternalError");
+      var wc;
 
-      for (var sc = Array(256), tc = 0; 256 > tc; ++tc) {
-        sc[tc] = String.fromCharCode(tc);
+      function xc(a) {
+        if (!ha && (A = !0, Ba(Fa), c.onExit)) c.onExit(a);
+        ba(a, new Qb(a));
       }
 
-      bb = sc;
-      cb = c.BindingError = Ya("BindingError");
+      c._exit = xc;
+      na("GMT", 26736, 4);
+      db = c.InternalError = cb("InternalError");
+
+      for (var yc = Array(256), zc = 0; 256 > zc; ++zc) {
+        yc[zc] = String.fromCharCode(zc);
+      }
+
+      gb = yc;
+      hb = c.BindingError = cb("BindingError");
 
       c.count_emval_handles = function () {
-        for (var a = 0, b = 5; b < P.length; ++b) {
-          void 0 !== P[b] && ++a;
+        for (var a = 0, b = 5; b < Q.length; ++b) {
+          void 0 !== Q[b] && ++a;
         }
 
         return a;
       };
 
       c.get_first_emval = function () {
-        for (var a = 5; a < P.length; ++a) {
-          if (void 0 !== P[a]) return P[a];
+        for (var a = 5; a < Q.length; ++a) {
+          if (void 0 !== Q[a]) return Q[a];
         }
 
         return null;
       };
 
-      mb = c.UnboundTypeError = Ya("UnboundTypeError");
+      rb = c.UnboundTypeError = cb("UnboundTypeError");
 
       c.requestFullScreen = function (a, b, d) {
-        v("Module.requestFullScreen is deprecated. Please call Module.requestFullscreen instead.");
+        w("Module.requestFullScreen is deprecated. Please call Module.requestFullscreen instead.");
         c.requestFullScreen = c.requestFullscreen;
-        ec(a, b, d);
+        jc(a, b, d);
       };
 
       c.requestFullscreen = function (a, b, d) {
-        $b(a, b, d);
+        ec(a, b, d);
       };
 
       c.requestAnimationFrame = function (a) {
-        Eb(a);
+        Jb(a);
       };
 
       c.setCanvasSize = function (a, b, d) {
-        bc(c.canvas, a, b);
-        d || cc();
+        gc(c.canvas, a, b);
+        d || hc();
       };
 
       c.pauseMainLoop = function () {
@@ -1369,12 +1330,12 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
       c.resumeMainLoop = function () {
         W++;
-        var a = yb,
-            b = zb,
-            d = Ab;
-        Ab = null;
-        Fb(d);
-        xb(a, b);
+        var a = Db,
+            b = Eb,
+            d = Fb;
+        Fb = null;
+        Kb(d);
+        Cb(a, b);
         U();
       };
 
@@ -1384,146 +1345,96 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
       };
 
       c.createContext = function (a, b, d, e) {
-        return Xb(a, b, d, e);
+        return bc(a, b, d, e);
       };
 
       "undefined" !== typeof dateNow ? V = dateNow : "object" === (typeof performance === "undefined" ? "undefined" : _typeof$1(performance)) && performance && "function" === typeof performance.now ? V = function V() {
         return performance.now();
       } : V = Date.now;
-      var xc = c.asm({}, {
-        k: z,
-        z: function z() {},
-        ea: function ea() {
-          v("missing function: _ZN5Umbra13MiniSceneCopy7connectERK20UmbraSceneCopySource");
-          z(-1);
+      Fa.push(function () {
+        var a = c._fflush;
+        a && a(0);
+        Ta[1].length && Ua(1, 10);
+        Ta[2].length && Ua(2, 10);
+      });
+
+      var Dc = {
+        W: function W() {
+          w("missing function: _ZN5Umbra13MiniSceneCopy7connectERK20UmbraSceneCopySource");
+          B(-1);
         },
-        $: function $() {
-          v("missing function: _ZN5Umbra13MiniSceneCopy9getStatusEPf");
-          z(-1);
+        V: function V() {
+          w("missing function: _ZN5Umbra13MiniSceneCopy9getStatusEPf");
+          B(-1);
         },
-        D: function D() {
-          v("missing function: _ZN5Umbra13MiniSceneCopyC1ERNS_11MiniRuntimeERK25UmbraSceneCopyDestinationPK20UmbraEnvironmentInfoRKN5Eigen6MatrixIfLi3ELi1ELi0ELi3ELi1EEEfi");
-          z(-1);
+        X: function X() {
+          w("missing function: _ZN5Umbra13MiniSceneCopyC1ERNS_11MiniRuntimeERK25UmbraSceneCopyDestinationPK20UmbraEnvironmentInfoRKN5Eigen6MatrixIfLi3ELi1ELi0ELi3ELi1EEEfi");
+          B(-1);
         },
-        Y: function Y() {
-          return Oa.apply(null, arguments);
+        C: function C() {
+          return Sa.apply(null, arguments);
         },
-        v: function v() {},
-        y: function y(a) {
-          c.___errno_location && (E[c.___errno_location() >> 2] = a);
-          return a;
-        },
-        M: function M(a, b) {
-          _I = b;
+        O: function O() {},
+        R: function R(a, b) {
+          J = b;
 
           try {
-            return Ra.Vb(), J(), J(), J(), J(), 0;
-          } catch (d) {
-            return z(d), -d.Qb;
-          }
-        },
-        L: function L(a, b) {
-          _I = b;
-
-          try {
-            var d = Ra.Vb(),
-                e = J(),
-                f = J();
-            return Ra.oc(d, e, f);
-          } catch (g) {
-            return z(g), -g.Qb;
-          }
-        },
-        x: function x(a, b) {
-          _I = b;
-
-          try {
-            var d = J(),
-                e = J(),
-                f = J();
-
-            for (b = a = 0; b < f; b++) {
-              for (var g = E[e + 8 * b >> 2], k = E[e + (8 * b + 4) >> 2], h = 0; h < k; h++) {
-                Qa(d, C[g + h]);
-              }
-
-              a += k;
-            }
-
-            return a;
-          } catch (l) {
-            return z(l), -l.Qb;
-          }
-        },
-        da: function da(a, b) {
-          _I = b;
-
-          try {
-            var d = B(J()),
-                e = J();
-            return Ra.pc((void 0).stat, d, e);
+            var d = D(Va()),
+                e = Va();
+            return Wa.kc((void 0).stat, d, e);
           } catch (f) {
-            return z(f), -f.Qb;
+            return B(f), -f.Nb;
           }
         },
-        K: function K(a, b) {
-          _I = b;
+        w: function w(a, b) {
+          J = b;
           return 0;
         },
-        ca: function ca(a, b) {
-          _I = b;
+        Q: function Q(a, b) {
+          J = b;
 
           try {
-            var d = B(J()),
-                e = J(),
-                f = J();
-            return (void 0).open(d, e, f).rc;
+            var d = D(Va()),
+                e = Va(),
+                f = Va();
+            return (void 0).open(d, e, f).mc;
           } catch (g) {
-            return z(g), -g.Qb;
+            return B(g), -g.Nb;
           }
         },
-        J: function J(a, b) {
-          _I = b;
+        P: function P(a, b) {
+          J = b;
           return 0;
         },
-        I: function I(a, b) {
-          _I = b;
-
-          try {
-            return Ra.Vb(), 0;
-          } catch (d) {
-            return z(d), -d.Qb;
-          }
-        },
-        w: function w() {},
-        H: function H(a) {
-          var b = Sa[a];
-          delete Sa[a];
-          var d = b.fc,
-              e = b.gc,
-              f = b.Ub,
+        s: function s() {},
+        A: function A(a) {
+          var b = Xa[a];
+          delete Xa[a];
+          var d = b.ac,
+              e = b.bc,
+              f = b.Qb,
               g = f.map(function (a) {
-            return a.ac;
+            return a.Wb;
           }).concat(f.map(function (a) {
-            return a.ic;
+            return a.dc;
           }));
-          $a([a], g, function (a) {
+          eb([a], g, function (a) {
             var g = {};
             f.forEach(function (b, d) {
               var e = a[d],
-                  h = b.Zb,
-                  k = b.$b,
+                  h = b.Ub,
+                  k = b.Vb,
                   l = a[d + f.length],
-                  m = b.hc,
-                  ya = b.jc;
-              g[b.Yb] = {
+                  p = b.cc,
+                  za = b.ec;
+              g[b.Tb] = {
                 read: function read(a) {
                   return e.fromWireType(h(k, a));
                 },
                 write: function write(a, b) {
                   var d = [];
-                  m(ya, a, l.toWireType(d, b));
-                  Ta(d);
+                  p(za, a, l.toWireType(d, b));
+                  Ya(d);
                 }
               };
             });
@@ -1555,13 +1466,13 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
                 return h;
               },
               argPackAdvance: 8,
-              readValueFromPointer: Ua,
-              Ob: e
+              readValueFromPointer: Za,
+              Kb: e
             }];
           });
         },
-        ba: function ba(a, b, d, e, f) {
-          var g = ab(d);
+        I: function I(a, b, d, e, f) {
+          var g = fb(d);
           b = N(b);
           M(a, {
             name: b,
@@ -1573,39 +1484,39 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
             },
             argPackAdvance: 8,
             readValueFromPointer: function readValueFromPointer(a) {
-              if (1 === d) var e = A;else if (2 === d) e = qa;else if (4 === d) e = E;else throw new TypeError("Unknown boolean type size: " + b);
+              if (1 === d) var e = C;else if (2 === d) e = ua;else if (4 === d) e = F;else throw new TypeError("Unknown boolean type size: " + b);
               return this.fromWireType(e[a >> g]);
             },
-            Ob: null
+            Kb: null
           });
         },
-        p: function p(a, b, d) {
+        k: function k(a, b, d) {
           a = N(a);
-          $a([], [b], function (b) {
+          eb([], [b], function (b) {
             b = b[0];
             c[a] = b.fromWireType(d);
             return [];
           });
         },
-        aa: function aa(a, b) {
+        G: function G(a, b) {
           b = N(b);
           M(a, {
             name: b,
             fromWireType: function fromWireType(a) {
-              var b = P[a].value;
-              eb(a);
+              var b = Q[a].value;
+              jb(a);
               return b;
             },
             toWireType: function toWireType(a, b) {
               return R(b);
             },
             argPackAdvance: 8,
-            readValueFromPointer: Ua,
-            Ob: null
+            readValueFromPointer: Za,
+            Kb: null
           });
         },
-        G: function G(a, b, d) {
-          d = ab(d);
+        u: function u(a, b, d) {
+          d = fb(d);
           b = N(b);
           M(a, {
             name: b,
@@ -1613,77 +1524,77 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
               return a;
             },
             toWireType: function toWireType(a, b) {
-              if ("number" !== typeof b && "boolean" !== typeof b) throw new TypeError('Cannot convert "' + fb(b) + '" to ' + this.name);
+              if ("number" !== typeof b && "boolean" !== typeof b) throw new TypeError('Cannot convert "' + kb(b) + '" to ' + this.name);
               return b;
             },
             argPackAdvance: 8,
-            readValueFromPointer: gb(b, d),
-            Ob: null
+            readValueFromPointer: lb(b, d),
+            Kb: null
           });
         },
-        j: function j(a, b, d, e, f, g) {
-          var k = kb(b, d);
+        e: function e(a, b, d, _e, f, g) {
+          var k = pb(b, d);
           a = N(a);
-          f = lb(e, f);
-          jb(a, function () {
-            pb("Cannot call " + a + " due to unbound types", k);
+          f = qb(_e, f);
+          ob(a, function () {
+            ub("Cannot call " + a + " due to unbound types", k);
           }, b - 1);
-          $a([], k, function (d) {
+          eb([], k, function (d) {
             var e = a,
                 h = a;
             d = [d[0], null].concat(d.slice(1));
             var k = f,
                 q = d.length;
-            2 > q && O("argTypes array size mismatch! Must at least get return value and 'this' types!");
+            2 > q && P("argTypes array size mismatch! Must at least get return value and 'this' types!");
 
-            for (var r = null !== d[1] && !1, y = !1, n = 1; n < d.length; ++n) {
-              if (null !== d[n] && void 0 === d[n].Ob) {
-                y = !0;
+            for (var t = null !== d[1] && !1, x = !1, m = 1; m < d.length; ++m) {
+              if (null !== d[m] && void 0 === d[m].Kb) {
+                x = !0;
                 break;
               }
             }
 
-            var ya = "void" !== d[0].name,
-                Q = "",
-                Z = "";
+            var za = "void" !== d[0].name,
+                O = "",
+                X = "";
 
-            for (n = 0; n < q - 2; ++n) {
-              Q += (0 !== n ? ", " : "") + "arg" + n, Z += (0 !== n ? ", " : "") + "arg" + n + "Wired";
+            for (m = 0; m < q - 2; ++m) {
+              O += (0 !== m ? ", " : "") + "arg" + m, X += (0 !== m ? ", " : "") + "arg" + m + "Wired";
             }
 
-            h = "return function " + Wa(h) + "(" + Q + ") {\nif (arguments.length !== " + (q - 2) + ") {\nthrowBindingError('function " + h + " called with ' + arguments.length + ' arguments, expected " + (q - 2) + " args!');\n}\n";
-            y && (h += "var destructors = [];\n");
-            var Mb = y ? "destructors" : "null";
-            Q = "throwBindingError invoker fn runDestructors retType classParam".split(" ");
-            k = [O, k, g, Ta, d[0], d[1]];
-            r && (h += "var thisWired = classParam.toWireType(" + Mb + ", this);\n");
+            h = "return function " + ab(h) + "(" + O + ") {\nif (arguments.length !== " + (q - 2) + ") {\nthrowBindingError('function " + h + " called with ' + arguments.length + ' arguments, expected " + (q - 2) + " args!');\n}\n";
+            x && (h += "var destructors = [];\n");
+            var Ub = x ? "destructors" : "null";
+            O = "throwBindingError invoker fn runDestructors retType classParam".split(" ");
+            k = [P, k, g, Ya, d[0], d[1]];
+            t && (h += "var thisWired = classParam.toWireType(" + Ub + ", this);\n");
 
-            for (n = 0; n < q - 2; ++n) {
-              h += "var arg" + n + "Wired = argType" + n + ".toWireType(" + Mb + ", arg" + n + "); // " + d[n + 2].name + "\n", Q.push("argType" + n), k.push(d[n + 2]);
+            for (m = 0; m < q - 2; ++m) {
+              h += "var arg" + m + "Wired = argType" + m + ".toWireType(" + Ub + ", arg" + m + "); // " + d[m + 2].name + "\n", O.push("argType" + m), k.push(d[m + 2]);
             }
 
-            r && (Z = "thisWired" + (0 < Z.length ? ", " : "") + Z);
-            h += (ya ? "var rv = " : "") + "invoker(fn" + (0 < Z.length ? ", " : "") + Z + ");\n";
-            if (y) h += "runDestructors(destructors);\n";else for (n = r ? 1 : 2; n < d.length; ++n) {
-              q = 1 === n ? "thisWired" : "arg" + (n - 2) + "Wired", null !== d[n].Ob && (h += q + "_dtor(" + q + "); // " + d[n].name + "\n", Q.push(q + "_dtor"), k.push(d[n].Ob));
+            t && (X = "thisWired" + (0 < X.length ? ", " : "") + X);
+            h += (za ? "var rv = " : "") + "invoker(fn" + (0 < X.length ? ", " : "") + X + ");\n";
+            if (x) h += "runDestructors(destructors);\n";else for (m = t ? 1 : 2; m < d.length; ++m) {
+              q = 1 === m ? "thisWired" : "arg" + (m - 2) + "Wired", null !== d[m].Kb && (h += q + "_dtor(" + q + "); // " + d[m].name + "\n", O.push(q + "_dtor"), k.push(d[m].Kb));
             }
-            ya && (h += "var ret = retType.fromWireType(rv);\nreturn ret;\n");
-            Q.push(h + "}\n");
-            d = hb(Q).apply(null, k);
-            n = b - 1;
-            if (!c.hasOwnProperty(e)) throw new Za("Replacing nonexistant public symbol");
-            void 0 !== c[e].Nb && void 0 !== n ? c[e].Nb[n] = d : (c[e] = d, c[e].Xb = n);
+            za && (h += "var ret = retType.fromWireType(rv);\nreturn ret;\n");
+            O.push(h + "}\n");
+            d = mb(O).apply(null, k);
+            m = b - 1;
+            if (!c.hasOwnProperty(e)) throw new db("Replacing nonexistant public symbol");
+            void 0 !== c[e].Jb && void 0 !== m ? c[e].Jb[m] = d : (c[e] = d, c[e].Sb = m);
             return [];
           });
         },
-        s: function s(a, b, d, e, f) {
+        o: function o(a, b, d, e, f) {
           function g(a) {
             return a;
           }
 
           b = N(b);
           -1 === f && (f = 4294967295);
-          var k = ab(d);
+          var k = fb(d);
 
           if (0 === e) {
             var h = 32 - 8 * d;
@@ -1698,19 +1609,19 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
             name: b,
             fromWireType: g,
             toWireType: function toWireType(a, d) {
-              if ("number" !== typeof d && "boolean" !== typeof d) throw new TypeError('Cannot convert "' + fb(d) + '" to ' + this.name);
-              if (d < e || d > f) throw new TypeError('Passing a number "' + fb(d) + '" from JS side to C/C++ side to an argument of type "' + b + '", which is outside the valid range [' + e + ", " + f + "]!");
+              if ("number" !== typeof d && "boolean" !== typeof d) throw new TypeError('Cannot convert "' + kb(d) + '" to ' + this.name);
+              if (d < e || d > f) throw new TypeError('Passing a number "' + kb(d) + '" from JS side to C/C++ side to an argument of type "' + b + '", which is outside the valid range [' + e + ", " + f + "]!");
               return l ? d >>> 0 : d | 0;
             },
             argPackAdvance: 8,
-            readValueFromPointer: qb(b, k, 0 !== e),
-            Ob: null
+            readValueFromPointer: vb(b, k, 0 !== e),
+            Kb: null
           });
         },
-        o: function o(a, b, d) {
+        m: function m(a, b, d) {
           function e(a) {
             a >>= 2;
-            var b = _F;
+            var b = G;
             return new f(b.buffer, b[a + 1], b[a]);
           }
 
@@ -1722,51 +1633,51 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
             argPackAdvance: 8,
             readValueFromPointer: e
           }, {
-            cc: !0
+            Yb: !0
           });
         },
-        F: function F(a, b) {
+        v: function v(a, b) {
           b = N(b);
           var d = "std::string" === b;
           M(a, {
             name: b,
             fromWireType: function fromWireType(a) {
-              var b = _F[a >> 2];
+              var b = G[a >> 2];
 
               if (d) {
-                var e = C[a + 4 + b],
+                var e = _E[a + 4 + b],
                     k = 0;
-                0 != e && (k = e, C[a + 4 + b] = 0);
+                0 != e && (k = e, _E[a + 4 + b] = 0);
                 var h = a + 4;
 
                 for (e = 0; e <= b; ++e) {
                   var l = a + 4 + e;
 
-                  if (0 == C[l]) {
-                    h = B(h);
-                    if (void 0 === m) var m = h;else m += String.fromCharCode(0), m += h;
+                  if (0 == _E[l]) {
+                    h = D(h);
+                    if (void 0 === p) var p = h;else p += String.fromCharCode(0), p += h;
                     h = l + 1;
                   }
                 }
 
-                0 != k && (C[a + 4 + b] = k);
+                0 != k && (_E[a + 4 + b] = k);
               } else {
-                m = Array(b);
+                p = Array(b);
 
                 for (e = 0; e < b; ++e) {
-                  m[e] = String.fromCharCode(C[a + 4 + e]);
+                  p[e] = String.fromCharCode(_E[a + 4 + e]);
                 }
 
-                m = m.join("");
+                p = p.join("");
               }
 
               S(a);
-              return m;
+              return p;
             },
             toWireType: function toWireType(a, b) {
               b instanceof ArrayBuffer && (b = new Uint8Array(b));
               var e = "string" === typeof b;
-              e || b instanceof Uint8Array || b instanceof Uint8ClampedArray || b instanceof Int8Array || O("Cannot pass non-string to std::string");
+              e || b instanceof Uint8Array || b instanceof Uint8ClampedArray || b instanceof Int8Array || P("Cannot pass non-string to std::string");
               var f = (d && e ? function () {
                 for (var a = 0, d = 0; d < b.length; ++d) {
                   var e = b.charCodeAt(d);
@@ -1778,114 +1689,114 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
               } : function () {
                 return b.length;
               })(),
-                  h = uc(4 + f + 1);
-              _F[h >> 2] = f;
-              if (d && e) ka(b, h + 4, f + 1);else if (e) for (e = 0; e < f; ++e) {
+                  h = Ac(4 + f + 1);
+              G[h >> 2] = f;
+              if (d && e) na(b, h + 4, f + 1);else if (e) for (e = 0; e < f; ++e) {
                 var l = b.charCodeAt(e);
-                255 < l && (S(h), O("String has UTF-16 code units that do not fit in 8 bits"));
-                C[h + 4 + e] = l;
+                255 < l && (S(h), P("String has UTF-16 code units that do not fit in 8 bits"));
+                _E[h + 4 + e] = l;
               } else for (e = 0; e < f; ++e) {
-                C[h + 4 + e] = b[e];
+                _E[h + 4 + e] = b[e];
               }
               null !== a && a.push(S, h);
               return h;
             },
             argPackAdvance: 8,
-            readValueFromPointer: Ua,
-            Ob: function Ob(a) {
+            readValueFromPointer: Za,
+            Kb: function Kb(a) {
               S(a);
             }
           });
         },
-        _: function _(a, b, d) {
+        H: function H(a, b, d) {
           d = N(d);
 
           if (2 === b) {
             var e = function e() {
-              return ra;
+              return va;
             };
 
             var f = 1;
           } else 4 === b && (e = function e() {
-            return _F;
+            return G;
           }, f = 2);
 
           M(a, {
             name: d,
             fromWireType: function fromWireType(a) {
-              for (var b = e(), d = _F[a >> 2], g = Array(d), m = a + 4 >> f, t = 0; t < d; ++t) {
-                g[t] = String.fromCharCode(b[m + t]);
+              for (var b = e(), d = G[a >> 2], g = Array(d), p = a + 4 >> f, u = 0; u < d; ++u) {
+                g[u] = String.fromCharCode(b[p + u]);
               }
 
               S(a);
               return g.join("");
             },
             toWireType: function toWireType(a, d) {
-              var g = e(),
-                  k = d.length,
-                  m = uc(4 + k * b);
-              _F[m >> 2] = k;
+              var g = d.length,
+                  k = Ac(4 + g * b),
+                  p = e();
+              G[k >> 2] = g;
 
-              for (var t = m + 4 >> f, q = 0; q < k; ++q) {
-                g[t + q] = d.charCodeAt(q);
+              for (var u = k + 4 >> f, q = 0; q < g; ++q) {
+                p[u + q] = d.charCodeAt(q);
               }
 
-              null !== a && a.push(S, m);
-              return m;
+              null !== a && a.push(S, k);
+              return k;
             },
             argPackAdvance: 8,
-            readValueFromPointer: Ua,
-            Ob: function Ob(a) {
+            readValueFromPointer: Za,
+            Kb: function Kb(a) {
               S(a);
             }
           });
         },
-        E: function E(a, b, d, e, f, g) {
-          Sa[a] = {
+        B: function B(a, b, d, e, f, g) {
+          Xa[a] = {
             name: N(b),
-            fc: lb(d, e),
-            gc: lb(f, g),
-            Ub: []
+            ac: qb(d, e),
+            bc: qb(f, g),
+            Qb: []
           };
         },
-        t: function t(a, b, d, e, f, g, k, h, l, m) {
-          Sa[a].Ub.push({
-            Yb: N(b),
-            ac: d,
-            Zb: lb(e, f),
-            $b: g,
-            ic: k,
-            hc: lb(h, l),
-            jc: m
+        q: function q(a, b, d, e, f, g, k, h, l, p) {
+          Xa[a].Qb.push({
+            Tb: N(b),
+            Wb: d,
+            Ub: qb(e, f),
+            Vb: g,
+            dc: k,
+            cc: qb(h, l),
+            ec: p
           });
         },
-        Z: function Z(a, b) {
+        J: function J(a, b) {
           b = N(b);
           M(a, {
-            dc: !0,
+            Zb: !0,
             name: b,
             argPackAdvance: 0,
             fromWireType: function fromWireType() {},
             toWireType: function toWireType() {}
           });
         },
-        i: function i(a, b, d) {
+        h: function h(a, b, d) {
           a = T(a);
-          b = rb(b, "emval::as");
+          b = wb(b, "emval::as");
           var e = [],
               f = R(e);
-          E[d >> 2] = f;
+          F[d >> 2] = f;
           return b.toWireType(e, a);
         },
-        m: function m(a, b, d, e) {
-          a = ub[a];
+        i: function i(a, b, d, e) {
+          a = zb[a];
           b = T(b);
-          d = tb(d);
+          d = yb(d);
           a(b, d, null, e);
         },
-        c: eb,
-        l: function l(a, b) {
-          b = wb(a, b);
+        a: jb,
+        j: function j(a, b) {
+          b = Bb(a, b);
 
           for (var d = b[0], e = d.name + "_$" + b.slice(1).map(function (a) {
             return a.name;
@@ -1893,7 +1804,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
             k += (0 !== h ? ", " : "") + "arg" + h, f.push("argType" + h), g.push(b[1 + h]);
           }
 
-          e = "return function " + Wa("methodCaller_" + e) + "(handle, name, destructors, args) {\n";
+          e = "return function " + ab("methodCaller_" + e) + "(handle, name, destructors, args) {\n";
           var l = 0;
 
           for (h = 0; h < a - 1; ++h) {
@@ -1906,146 +1817,287 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
             b[h + 1].deleteObject && (e += "    argType" + h + ".deleteObject(arg" + h + ");\n");
           }
 
-          d.dc || (e += "    return retType.toWireType(destructors, rv);\n");
+          d.Zb || (e += "    return retType.toWireType(destructors, rv);\n");
           f.push(e + "};\n");
-          a = hb(f).apply(null, g);
-          return vb(a);
+          a = mb(f).apply(null, g);
+          return Ab(a);
         },
-        g: function g(a, b) {
+        f: function f(a, b) {
           a = T(a);
           b = T(b);
           return R(a[b]);
         },
-        u: function u(a) {
-          4 < a && (P[a].Tb += 1);
+        p: function p(a) {
+          4 < a && (Q[a].Pb += 1);
         },
-        r: function r() {
+        n: function n() {
           return R([]);
         },
-        e: function e(a) {
-          return R(tb(a));
+        b: function b(a) {
+          return R(yb(a));
         },
-        q: function q() {
+        l: function l() {
           return R({});
         },
-        h: function h(a) {
-          Ta(P[a].value);
-          eb(a);
+        g: function g(a) {
+          Ya(Q[a].value);
+          jb(a);
         },
-        f: function f(a, b, d) {
+        d: function d(a, b, _d) {
           a = T(a);
           b = T(b);
-          d = T(d);
-          a[b] = d;
+          _d = T(_d);
+          a[b] = _d;
         },
-        d: function d(a, b) {
-          a = rb(a, "_emval_take_value");
+        c: function c(a, b) {
+          a = wb(a, "_emval_take_value");
           a = a.readValueFromPointer(b);
           return R(a);
         },
-        X: function X() {
-          c.abort();
+        S: function S() {
+          B();
         },
-        C: function C(a) {
-          return Ma[a]();
-        },
-        W: function W(a, b, d, e, f, g, k, h, l, m, t, q) {
-          return Ma[a](b, d, e, f, g, k, h, l, m, t, q);
-        },
-        B: function B(a) {
-          (a = Y[a]) && a.abort();
-        },
-        V: jc,
-        n: V,
-        A: function A(a, b, d, e, f) {
-          oc(B(a), B(b), function (a, b) {
-            a ? f && vc(f, d) : (a = uc(b.length), C.set(b, a), wc(e, d, a, b.length), S(a));
-          });
-        },
-        U: function U(a, b, d, e, f, g, k) {
-          pc(B(a), B(b), new Uint8Array(C.subarray(d, d + e)), function (a) {
-            a ? k && vc(k, f) : g && vc(g, f);
-          });
-        },
-        T: function T(a, b, d) {
-          C.set(C.subarray(b, b + d), a);
-        },
-        S: function S(a) {
-          if (2147418112 < a) return !1;
+        r: function r(a, b, d) {
+          a: for (Qa.length = 0;;) {
+            var e = _E[b++];
 
-          for (var b = Math.max(jc(), 16777216); b < a;) {
-            536870912 >= b ? b = pa(2 * b) : b = Math.min(pa((3 * b + 2147483648) / 4), 2147418112);
+            if (!e) {
+              b = Qa;
+              break a;
+            }
+
+            100 === e || 102 === e ? (d = da(d, 8), Qa.push(xa[d >> 3]), d += 8) : 105 === e && (d = da(d, 4), Qa.push(F[d >> 2]), d += 4);
           }
 
-          if (!rc(b)) return !1;
-          ua();
-          return !0;
+          return Pa[a].apply(null, b);
         },
-        R: qc,
-        Q: function Q(a) {
-          a = new Date(1E3 * E[a >> 2]);
-          E[4320] = a.getUTCSeconds();
-          E[4321] = a.getUTCMinutes();
-          E[4322] = a.getUTCHours();
-          E[4323] = a.getUTCDate();
-          E[4324] = a.getUTCMonth();
-          E[4325] = a.getUTCFullYear() - 1900;
-          E[4326] = a.getUTCDay();
-          E[4329] = 0;
-          E[4328] = 0;
-          E[4327] = (a.getTime() - Date.UTC(a.getUTCFullYear(), 0, 1, 0, 0, 0, 0)) / 864E5 | 0;
-          E[4330] = 17328;
-          return 17280;
+        z: function z(a) {
+          (a = Z[a]) && a.abort();
         },
-        P: function P() {
-          z("trap!");
+        Z: V,
+        y: function y(a, b, d, e, f) {
+          sc(D(a), D(b), function (a, b) {
+            a ? f && Bc(f, d) : (a = Ac(b.length), _E.set(b, a), Cc(e, d, a, b.length), S(a));
+          });
         },
-        O: function O(a) {
-          var b = Date.now() / 1E3 | 0;
-          a && (E[a >> 2] = b);
-          return b;
+        Y: function Y(a, b, d, e, f, g, k) {
+          tc(D(a), D(b), new Uint8Array(_E.subarray(d, d + e)), function (a) {
+            a ? k && Bc(k, f) : g && Bc(g, f);
+          });
         },
-        N: function N() {
-          z("OOM");
+        E: function E(a, b, d) {
+          _E.set(_E.subarray(b, b + d), a);
         },
-        a: 17424,
-        b: 17264
-      }, D);
-      c.asm = xc;
+        F: function F(a) {
+          if (2147418112 < a) return !1;
 
-      c._UmbraAssetLoadAbortRequested = function () {
-        return c.asm.fa.apply(null, arguments);
+          for (var b = Math.max(C.length, 16777216); b < a;) {
+            536870912 >= b ? b = sa(2 * b) : b = Math.min(sa((3 * b + 2147483648) / 4), 2147418112);
+          }
+
+          a: {
+            try {
+              z.grow(b - ta.byteLength + 65535 >> 16);
+              ya(z.buffer);
+              var d = 1;
+              break a;
+            } catch (e) {}
+
+            d = void 0;
+          }
+
+          return d ? !0 : !1;
+        },
+        K: function K(a, b) {
+          var d = 0;
+          vc().forEach(function (e, f) {
+            var g = b + d;
+            f = F[a + 4 * f >> 2] = g;
+
+            for (g = 0; g < e.length; ++g) {
+              C[f++ >> 0] = e.charCodeAt(g);
+            }
+
+            C[f >> 0] = 0;
+            d += e.length + 1;
+          });
+          return 0;
+        },
+        L: function L(a, b) {
+          var d = vc();
+          F[a >> 2] = d.length;
+          var e = 0;
+          d.forEach(function (a) {
+            e += a.length + 1;
+          });
+          F[b >> 2] = e;
+          return 0;
+        },
+        _: xc,
+        x: function x() {
+          return 0;
+        },
+        N: function N(a, b, d, e) {
+          try {
+            var f = Wa.nc(a),
+                g = Wa.jc(f, b, d);
+            F[e >> 2] = g;
+            return 0;
+          } catch (k) {
+            return B(k), k.Nb;
+          }
+        },
+        D: function D() {
+          return 0;
+        },
+        M: function M(a, b, d, e) {
+          try {
+            for (var f = 0, g = 0; g < d; g++) {
+              for (var k = F[b + 8 * g >> 2], h = F[b + (8 * g + 4) >> 2], l = 0; l < h; l++) {
+                Ua(a, _E[k + l]);
+              }
+
+              f += h;
+            }
+
+            F[e >> 2] = f;
+            return 0;
+          } catch (p) {
+            return B(p), p.Nb;
+          }
+        },
+        T: function T(a) {
+          a = new Date(1E3 * F[a >> 2]);
+          F[6672] = a.getUTCSeconds();
+          F[6673] = a.getUTCMinutes();
+          F[6674] = a.getUTCHours();
+          F[6675] = a.getUTCDate();
+          F[6676] = a.getUTCMonth();
+          F[6677] = a.getUTCFullYear() - 1900;
+          F[6678] = a.getUTCDay();
+          F[6681] = 0;
+          F[6680] = 0;
+          F[6679] = (a.getTime() - Date.UTC(a.getUTCFullYear(), 0, 1, 0, 0, 0, 0)) / 864E5 | 0;
+          F[6682] = 26736;
+          return 26688;
+        },
+        memory: z,
+        t: function t() {},
+        table: ia,
+        U: function U(a) {
+          var b = Date.now() / 1E3 | 0;
+          a && (F[a >> 2] = b);
+          return b;
+        }
+      },
+          Ec = function () {
+        function a(a) {
+          c.asm = a.exports;
+          H--;
+          c.monitorRunDependencies && c.monitorRunDependencies(H);
+          0 == H && (Ja && (a = Ja, Ja = null, a()));
+        }
+
+        function b(b) {
+          a(b.instance);
+        }
+
+        function d(a) {
+          return Na().then(function (a) {
+            return WebAssembly.instantiate(a, e);
+          }).then(a, function (a) {
+            w("failed to asynchronously prepare wasm: " + a);
+            B(a);
+          });
+        }
+
+        var e = {
+          env: Dc,
+          wasi_unstable: Dc
+        };
+        H++;
+        c.monitorRunDependencies && c.monitorRunDependencies(H);
+        if (c.instantiateWasm) try {
+          return c.instantiateWasm(e, a);
+        } catch (f) {
+          return w("Module.instantiateWasm callback failed with error: " + f), !1;
+        }
+
+        (function () {
+          if (y || "function" !== typeof WebAssembly.instantiateStreaming || Ka() || "function" !== typeof fetch) return d(b);
+          fetch(I, {
+            credentials: "same-origin"
+          }).then(function (a) {
+            return WebAssembly.instantiateStreaming(a, e).then(b, function (a) {
+              w("wasm streaming compile failed: " + a);
+              w("falling back to ArrayBuffer instantiation");
+              d(b);
+            });
+          });
+        })();
+
+        return {};
+      }();
+
+      c.asm = Ec;
+
+      var Ra = c.___wasm_call_ctors = function () {
+        return c.asm.$.apply(null, arguments);
       };
 
-      c._UmbraAssetLoadFinish = function () {
-        return c.asm.ga.apply(null, arguments);
+      c._UmbraMeshLoadGetInfo = function () {
+        return c.asm.aa.apply(null, arguments);
+      };
+
+      c._UmbraMeshLoadGetSerializedSize = function () {
+        return c.asm.ba.apply(null, arguments);
+      };
+
+      c._UmbraMeshLoadSerialize = function () {
+        return c.asm.ca.apply(null, arguments);
       };
 
       c._UmbraAssetLoadGetType = function () {
+        return c.asm.da.apply(null, arguments);
+      };
+
+      c._UmbraTextureLoadGetInfo = function () {
+        return c.asm.ea.apply(null, arguments);
+      };
+
+      c._UmbraTextureLoadGetSerializedSize = function () {
+        return c.asm.fa.apply(null, arguments);
+      };
+
+      c._UmbraTextureLoadSerialize = function () {
+        return c.asm.ga.apply(null, arguments);
+      };
+
+      c._UmbraGeodeticToEcef = function () {
         return c.asm.ha.apply(null, arguments);
       };
 
-      c._UmbraAssetLoadPrepare = function () {
+      c._UmbraEcefToGeodetic = function () {
         return c.asm.ia.apply(null, arguments);
       };
 
-      c._UmbraAssetUnloadFinish = function () {
+      c._UmbraTextureGetMipmapLevelByteSize = function () {
         return c.asm.ja.apply(null, arguments);
       };
 
-      c._UmbraAssetUnloadGetType = function () {
+      c._UmbraTextureGetMipmapLevelOffset = function () {
         return c.asm.ka.apply(null, arguments);
       };
 
-      c._UmbraAssetUnloadGetUserPointer = function () {
+      var Ac = c._malloc = function () {
         return c.asm.la.apply(null, arguments);
       };
 
-      c._UmbraClientCreate = function () {
+      c._UmbraMeshLoadFinishExternal = function () {
         return c.asm.ma.apply(null, arguments);
       };
 
-      c._UmbraClientDestroy = function () {
+      var S = c._free = function () {
         return c.asm.na.apply(null, arguments);
       };
 
@@ -2053,253 +2105,240 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return c.asm.oa.apply(null, arguments);
       };
 
-      c._UmbraEcefToGeodetic = function () {
+      c._UmbraSetAllocator = function () {
         return c.asm.pa.apply(null, arguments);
       };
 
-      c._UmbraEnvironmentInfoDefaults = function () {
+      c._UmbraSetLogger = function () {
         return c.asm.qa.apply(null, arguments);
       };
 
-      c._UmbraGeodeticToEcef = function () {
+      c._UmbraSetHttp = function () {
         return c.asm.ra.apply(null, arguments);
       };
 
-      c._UmbraGetLibraryInfo = function () {
+      c._UmbraClientCreate = function () {
         return c.asm.sa.apply(null, arguments);
       };
 
-      c._UmbraMaterialLoadGetInfo = function () {
+      c._UmbraClientDestroy = function () {
         return c.asm.ta.apply(null, arguments);
       };
 
-      c._UmbraMeshLoadFinishExternal = function () {
+      c._UmbraGetLibraryInfo = function () {
         return c.asm.ua.apply(null, arguments);
       };
 
-      c._UmbraMeshLoadGetData = function () {
+      c._UmbraEnvironmentInfoDefaults = function () {
         return c.asm.va.apply(null, arguments);
       };
 
-      c._UmbraMeshLoadGetInfo = function () {
+      c._UmbraRuntimeCreate = function () {
         return c.asm.wa.apply(null, arguments);
       };
 
-      c._UmbraMeshLoadGetSerializedSize = function () {
+      c._UmbraRuntimeDestroy = function () {
         return c.asm.xa.apply(null, arguments);
       };
 
-      c._UmbraMeshLoadSerialize = function () {
+      c._UmbraRuntimeUpdate = function () {
         return c.asm.ya.apply(null, arguments);
       };
 
-      c._UmbraMeshStreamDone = function () {
+      c._UmbraRuntimeGetStreamingState = function () {
         return c.asm.za.apply(null, arguments);
       };
 
-      c._UmbraMeshStreamNext = function () {
+      c._UmbraRuntimeNextAssetUnload = function () {
         return c.asm.Aa.apply(null, arguments);
       };
 
-      c._UmbraMeshStreamSetBuffers = function () {
+      c._UmbraAssetUnloadFinish = function () {
         return c.asm.Ba.apply(null, arguments);
       };
 
-      c._UmbraRuntimeCreate = function () {
+      c._UmbraAssetUnloadGetType = function () {
         return c.asm.Ca.apply(null, arguments);
       };
 
-      c._UmbraRuntimeDestroy = function () {
+      c._UmbraAssetUnloadGetUserPointer = function () {
         return c.asm.Da.apply(null, arguments);
       };
 
-      c._UmbraRuntimeGetStreamingState = function () {
+      c._UmbraRuntimeNextAssetLoad = function () {
         return c.asm.Ea.apply(null, arguments);
       };
 
-      c._UmbraRuntimeNextAssetLoad = function () {
+      c._UmbraAssetLoadPrepare = function () {
         return c.asm.Fa.apply(null, arguments);
       };
 
-      c._UmbraRuntimeNextAssetUnload = function () {
+      c._UmbraAssetLoadFinish = function () {
         return c.asm.Ga.apply(null, arguments);
       };
 
-      c._UmbraRuntimeUpdate = function () {
+      c._UmbraAssetLoadAbortRequested = function () {
         return c.asm.Ha.apply(null, arguments);
       };
 
-      c._UmbraSceneCopyCreate = function () {
+      c._UmbraVertexAttributeGetElementByteSize = function () {
         return c.asm.Ia.apply(null, arguments);
       };
 
-      c._UmbraSceneCopyDestroy = function () {
+      c._UmbraMeshLoadGetData = function () {
         return c.asm.Ja.apply(null, arguments);
       };
 
-      c._UmbraSceneCopyGetError = function () {
+      c._UmbraMeshStreamSetBuffers = function () {
         return c.asm.Ka.apply(null, arguments);
       };
 
-      c._UmbraSceneCopyGetStatus = function () {
+      c._UmbraMeshStreamDone = function () {
         return c.asm.La.apply(null, arguments);
       };
 
-      c._UmbraSceneCreate = function () {
+      c._UmbraMeshStreamNext = function () {
         return c.asm.Ma.apply(null, arguments);
       };
 
-      c._UmbraSceneCreateLocal = function () {
+      c._UmbraMaterialLoadGetInfo = function () {
         return c.asm.Na.apply(null, arguments);
       };
 
-      c._UmbraSceneCreatePublic = function () {
+      c._UmbraTextureLoadGetData = function () {
         return c.asm.Oa.apply(null, arguments);
       };
 
-      c._UmbraSceneDestroy = function () {
+      c._UmbraTextureMetaDataLoadGetData = function () {
         return c.asm.Pa.apply(null, arguments);
       };
 
-      c._UmbraSceneGetConnectionStatus = function () {
+      c._UmbraTextureMetaDataGetClassificationCount = function () {
         return c.asm.Qa.apply(null, arguments);
       };
 
-      c._UmbraSceneGetInfo = function () {
+      c._UmbraTextureMetaDataGetClassification = function () {
         return c.asm.Ra.apply(null, arguments);
       };
 
-      c._UmbraSceneSetTransform = function () {
+      c._UmbraTextureMetaDataGetClassificationAmount = function () {
         return c.asm.Sa.apply(null, arguments);
       };
 
-      c._UmbraSendInternalMessage = function () {
+      c._UmbraSceneCreate = function () {
         return c.asm.Ta.apply(null, arguments);
       };
 
-      c._UmbraSetAllocator = function () {
+      c._UmbraSceneCreatePublic = function () {
         return c.asm.Ua.apply(null, arguments);
       };
 
-      c._UmbraSetHttp = function () {
+      c._UmbraSceneCreateLocal = function () {
         return c.asm.Va.apply(null, arguments);
       };
 
-      c._UmbraSetLogger = function () {
+      c._UmbraSceneDestroy = function () {
         return c.asm.Wa.apply(null, arguments);
       };
 
-      c._UmbraTextureGetMipmapLevelByteSize = function () {
+      c._UmbraSceneGetConnectionStatus = function () {
         return c.asm.Xa.apply(null, arguments);
       };
 
-      c._UmbraTextureGetMipmapLevelOffset = function () {
+      c._UmbraSceneGetInfo = function () {
         return c.asm.Ya.apply(null, arguments);
       };
 
-      c._UmbraTextureLoadGetData = function () {
+      c._UmbraSceneSetTransform = function () {
         return c.asm.Za.apply(null, arguments);
       };
 
-      c._UmbraTextureLoadGetInfo = function () {
+      c._UmbraSceneCopyCreate = function () {
         return c.asm._a.apply(null, arguments);
       };
 
-      c._UmbraTextureLoadGetSerializedSize = function () {
+      c._UmbraSceneCopyDestroy = function () {
         return c.asm.$a.apply(null, arguments);
       };
 
-      c._UmbraTextureLoadSerialize = function () {
+      c._UmbraSceneCopyGetStatus = function () {
         return c.asm.ab.apply(null, arguments);
       };
 
-      c._UmbraTextureMetaDataGetClassification = function () {
+      c._UmbraSceneCopyGetError = function () {
         return c.asm.bb.apply(null, arguments);
       };
 
-      c._UmbraTextureMetaDataGetClassificationAmount = function () {
+      c._UmbraViewCreate = function () {
         return c.asm.cb.apply(null, arguments);
       };
 
-      c._UmbraTextureMetaDataGetClassificationCount = function () {
+      c._UmbraViewDestroy = function () {
         return c.asm.db.apply(null, arguments);
       };
 
-      c._UmbraTextureMetaDataLoadGetData = function () {
+      c._UmbraViewUpdateRendering = function () {
         return c.asm.eb.apply(null, arguments);
       };
 
-      c._UmbraVertexAttributeGetElementByteSize = function () {
+      c._UmbraViewUpdateFilter = function () {
         return c.asm.fb.apply(null, arguments);
       };
 
-      c._UmbraViewCreate = function () {
+      c._UmbraViewGetCompleted = function () {
         return c.asm.gb.apply(null, arguments);
       };
 
-      c._UmbraViewDestroy = function () {
+      c._UmbraViewResetRenderables = function () {
         return c.asm.hb.apply(null, arguments);
       };
 
-      c._UmbraViewGetCompleted = function () {
+      c._UmbraViewNextRenderables = function () {
         return c.asm.ib.apply(null, arguments);
       };
 
-      c._UmbraViewNextRenderables = function () {
+      c._UmbraViewRayQuery = function () {
         return c.asm.jb.apply(null, arguments);
       };
 
-      c._UmbraViewRayQuery = function () {
+      c._UmbraSendInternalMessage = function () {
         return c.asm.kb.apply(null, arguments);
       };
 
-      c._UmbraViewResetRenderables = function () {
+      var tb = c.___getTypeName = function () {
         return c.asm.lb.apply(null, arguments);
       };
 
-      c._UmbraViewUpdateFilter = function () {
+      c.___embind_register_native_and_builtin_types = function () {
         return c.asm.mb.apply(null, arguments);
       };
 
-      c._UmbraViewUpdateRendering = function () {
+      var oa = c.stackSave = function () {
         return c.asm.nb.apply(null, arguments);
-      };
-
-      c.___embind_register_native_and_builtin_types = function () {
+      },
+          ma = c.stackAlloc = function () {
         return c.asm.ob.apply(null, arguments);
-      };
-
-      var ob = c.___getTypeName = function () {
+      },
+          pa = c.stackRestore = function () {
         return c.asm.pb.apply(null, arguments);
       },
-          S = c._free = function () {
+          Bc = c.dynCall_vi = function () {
         return c.asm.qb.apply(null, arguments);
-      },
-          uc = c._malloc = function () {
-        return c.asm.rb.apply(null, arguments);
-      },
-          Na = c.globalCtors = function () {
-        return c.asm.Jb.apply(null, arguments);
-      },
-          ja = c.stackAlloc = function () {
-        return c.asm.Kb.apply(null, arguments);
-      },
-          ma = c.stackRestore = function () {
-        return c.asm.Lb.apply(null, arguments);
-      },
-          la = c.stackSave = function () {
-        return c.asm.Mb.apply(null, arguments);
       };
 
-      c.dynCall_i = function () {
+      c.dynCall_v = function () {
+        return c.asm.rb.apply(null, arguments);
+      };
+
+      c.dynCall_iiiiiiiiii = function () {
         return c.asm.sb.apply(null, arguments);
       };
 
-      c.dynCall_ii = function () {
+      c.dynCall_viiiiiiiii = function () {
         return c.asm.tb.apply(null, arguments);
       };
 
-      c.dynCall_iii = function () {
+      c.dynCall_iiiii = function () {
         return c.asm.ub.apply(null, arguments);
       };
 
@@ -2307,39 +2346,39 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return c.asm.vb.apply(null, arguments);
       };
 
-      c.dynCall_iiiii = function () {
+      c.dynCall_iii = function () {
         return c.asm.wb.apply(null, arguments);
       };
 
-      c.dynCall_iiiiii = function () {
+      c.dynCall_ii = function () {
         return c.asm.xb.apply(null, arguments);
       };
 
-      c.dynCall_iiiiiiiiii = function () {
+      c.dynCall_vii = function () {
         return c.asm.yb.apply(null, arguments);
       };
 
-      c.dynCall_iiiji = function () {
+      c.dynCall_iiiiii = function () {
         return c.asm.zb.apply(null, arguments);
       };
 
-      c.dynCall_jiji = function () {
+      c.dynCall_viiiii = function () {
         return c.asm.Ab.apply(null, arguments);
       };
 
-      c.dynCall_v = function () {
+      c.dynCall_iiiiiiii = function () {
         return c.asm.Bb.apply(null, arguments);
       };
 
-      var vc = c.dynCall_vi = function () {
+      c.dynCall_viiiiiii = function () {
         return c.asm.Cb.apply(null, arguments);
       };
 
-      c.dynCall_vii = function () {
+      c.dynCall_i = function () {
         return c.asm.Db.apply(null, arguments);
       };
 
-      var wc = c.dynCall_viii = function () {
+      var Cc = c.dynCall_viii = function () {
         return c.asm.Eb.apply(null, arguments);
       };
 
@@ -2347,32 +2386,34 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return c.asm.Fb.apply(null, arguments);
       };
 
-      c.dynCall_viiiii = function () {
+      c.dynCall_jiji = function () {
         return c.asm.Gb.apply(null, arguments);
       };
 
-      c.dynCall_viiiiii = function () {
+      c.dynCall_iidiiii = function () {
         return c.asm.Hb.apply(null, arguments);
       };
 
-      c.dynCall_viiiiiiiii = function () {
+      c.dynCall_viiiiii = function () {
         return c.asm.Ib.apply(null, arguments);
       };
 
-      c.asm = xc;
+      c.asm = Ec;
 
       c.cwrap = function (a, b, d, e) {
         d = d || [];
         var f = d.every(function (a) {
           return "number" === a;
         });
-        return "string" !== b && f && !e ? ha(a) : function () {
-          return ia(a, b, d, arguments);
+        return "string" !== b && f && !e ? ka(a) : function () {
+          return la(a, b, d, arguments);
         };
       };
 
+      var Fc;
+
       c.then = function (a) {
-        if (c.calledRun) a(c);else {
+        if (Fc) a(c);else {
           var b = c.onRuntimeInitialized;
 
           c.onRuntimeInitialized = function () {
@@ -2383,40 +2424,37 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return c;
       };
 
-      function Lb(a) {
+      function Qb(a) {
         this.name = "ExitStatus";
         this.message = "Program terminated with exit(" + a + ")";
         this.status = a;
       }
 
-      Lb.prototype = Error();
-      Lb.prototype.constructor = Lb;
-
-      Fa = function yc() {
-        c.calledRun || zc();
-        c.calledRun || (Fa = yc);
+      Ja = function Gc() {
+        Fc || Hc();
+        Fc || (Ja = Gc);
       };
 
-      function zc() {
+      function Hc() {
         function a() {
-          if (!c.calledRun && (c.calledRun = !0, !x)) {
-            wa(za);
-            wa(Aa);
+          if (!Fc && (Fc = !0, !A)) {
+            Ba(Da);
+            Ba(Ea);
             if (c.onRuntimeInitialized) c.onRuntimeInitialized();
             if (c.postRun) for ("function" == typeof c.postRun && (c.postRun = [c.postRun]); c.postRun.length;) {
               var a = c.postRun.shift();
-              Ca.unshift(a);
+              Ga.unshift(a);
             }
-            wa(Ca);
+            Ba(Ga);
           }
         }
 
-        if (!(0 < G)) {
+        if (!(0 < H)) {
           if (c.preRun) for ("function" == typeof c.preRun && (c.preRun = [c.preRun]); c.preRun.length;) {
-            Da();
+            Ha();
           }
-          wa(xa);
-          0 < G || c.calledRun || (c.setStatus ? (c.setStatus("Running..."), setTimeout(function () {
+          Ba(Ca);
+          0 < H || (c.setStatus ? (c.setStatus("Running..."), setTimeout(function () {
             setTimeout(function () {
               c.setStatus("");
             }, 1);
@@ -2425,71 +2463,61 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }
       }
 
-      c.run = zc;
-
-      function z(a) {
-        if (c.onAbort) c.onAbort(a);
-        ba(a);
-        v(a);
-        x = !0;
-        throw "abort(" + a + "). Build with -s ASSERTIONS=1 for more info.";
-      }
-
-      c.abort = z;
+      c.run = Hc;
       if (c.preInit) for ("function" == typeof c.preInit && (c.preInit = [c.preInit]); 0 < c.preInit.length;) {
         c.preInit.pop()();
       }
-      zc();
+      Hc();
       c.maxBytesDownloaded = 0;
       c.minBytesDownloaded = 0;
       c.URLsDownloaded = new Set([]);
-      c.wgetRequests = Y;
+      c.wgetRequests = Z;
 
-      function La(a, b, d, e, f, g, k, h, l, m, t) {
-        var q = B(a);
-        b = B(b);
-        g = B(g);
-        var r = new XMLHttpRequest();
-        r.open(b, q, !0);
-        if ("GET" != b || 0 != g.length) r.withCredentials = !0;
-        r.responseType = "arraybuffer";
-        var y = ic();
+      function Oa(a, b, d, e, f, g, k, h, l, p, u) {
+        var q = D(a);
+        b = D(b);
+        g = D(g);
+        var t = new XMLHttpRequest();
+        t.open(b, q, !0);
+        if ("GET" != b || 0 != g.length) t.withCredentials = !0;
+        t.responseType = "arraybuffer";
+        var x = nc();
 
-        r.onload = function () {
-          if (200 == r.status) {
-            var b = new Uint8Array(r.response),
+        t.onload = function () {
+          if (200 == t.status) {
+            var b = new Uint8Array(t.response),
                 g = c.URLsDownloaded;
-            c.maxBytesDownloaded += r.response.byteLength;
-            g.has(a) || (g.add(a), c.minBytesDownloaded += r.response.byteLength);
-            m ? b.length != t ? c.dynCall_viii(f, y, d, 0) : (C.set(b, m), c.dynCall_viiii(e, y, d, null, 0)) : (g = uc(b.length), C.set(b, g), c.dynCall_viiii(e, y, d, g, b.length), S(g));
-          } else c.dynCall_viii(f, y, d, r.status);
+            c.maxBytesDownloaded += t.response.byteLength;
+            g.has(a) || (g.add(a), c.minBytesDownloaded += t.response.byteLength);
+            p ? b.length != u ? c.dynCall_viii(f, x, d, 0) : (_E.set(b, p), c.dynCall_viiii(e, x, d, null, 0)) : (g = Ac(b.length), _E.set(b, g), c.dynCall_viiii(e, x, d, g, b.length), S(g));
+          } else c.dynCall_viii(f, x, d, t.status);
 
-          delete Y[y];
+          delete Z[x];
         };
 
-        r.onerror = function () {
-          c.dynCall_viii(f, y, d, r.status);
-          delete Y[y];
+        t.onerror = function () {
+          c.dynCall_viii(f, x, d, t.status);
+          delete Z[x];
         };
 
-        r.onabort = function () {
-          delete Y[y];
+        t.onabort = function () {
+          delete Z[x];
         };
 
-        0 != g.length && r.setRequestHeader("Authorization", "Basic " + btoa(g + ":"));
-        l = B(l).split("\n");
+        0 != g.length && t.setRequestHeader("Authorization", "Basic " + btoa(g + ":"));
+        l = D(l).split("\n");
         if (2 <= l.length) for (q = 0; q < l.length; q += 2) {
-          r.setRequestHeader(l[q], l[q + 1]);
+          t.setRequestHeader(l[q], l[q + 1]);
         }
-        "POST" == b ? r.send(A.slice(k, k + h)) : r.send(null);
-        Y[y] = r;
-        return y;
+        "POST" == b ? t.send(C.slice(k, k + h)) : t.send(null);
+        Z[x] = t;
+        return x;
       }
       return UmbraNativeAPI;
     };
   }();
 
-  // Generated at 2020-07-06 15:28:19
+  // Generated at 2020-07-14 16:33:24
   var MatrixFormat;
 
   (function (MatrixFormat) {
@@ -2694,7 +2722,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
   (function (FilterShapeType) {
     FilterShapeType[FilterShapeType["Sphere"] = 0] = "Sphere";
     FilterShapeType[FilterShapeType["Cylinder"] = 1] = "Cylinder";
-    FilterShapeType[FilterShapeType["Count"] = 2] = "Count";
+    FilterShapeType[FilterShapeType["None"] = 2] = "None";
+    FilterShapeType[FilterShapeType["Count"] = 3] = "Count";
   })(FilterShapeType || (FilterShapeType = {}));
 
   var SceneCopyStatus;
@@ -2752,9 +2781,114 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
 
   var Assets = /*#__PURE__*/Object.freeze({
+    __proto__: null,
     get AssetType () { return AssetType; },
     get AssetLoadResult () { return AssetLoadResult; }
   });
+
+  class WorkerPool {
+    constructor(numWorkers, workerScriptURL, abortCheckCallback) {
+      var _this = this;
+
+      // List of web workers and their metadatas
+      this.workers = [];
+      this.infos = [];
+
+      if (!window['Worker']) {
+        console.error('WebWorker support required');
+        return;
+      }
+
+      var _loop = function _loop(i) {
+        // const worker = new Worker('../dist/UmbraPlayerWorker.js')
+        var worker = new Worker(workerScriptURL);
+
+        worker.onmessage = function (msg) {
+          var _this$infos$i$queue$s = _this.infos[i].queue.shift(),
+              userData = _this$infos$i$queue$s.userData,
+              callback = _this$infos$i$queue$s.callback;
+
+          if (abortCheckCallback()) {
+            console.log('Runtime aborted');
+            return;
+          }
+
+          if (!msg.data['finalResponse']) {
+            console.error('emscripten_worker_respond_provisionally is not supported');
+            return;
+          }
+
+          callback(msg.data.data, userData);
+        };
+
+        worker.onerror = function (msg) {
+          console.error("Worker call failed. Is worker's script URL \"".concat(workerScriptURL, "\" correct? Message:"), msg.message);
+
+          var _this$infos$i$queue$s2 = _this.infos[i].queue.shift(),
+              userData = _this$infos$i$queue$s2.userData,
+              callback = _this$infos$i$queue$s2.callback;
+
+          callback(undefined, userData);
+        };
+
+        var info = {
+          queue: []
+        };
+
+        _this.workers.push(worker);
+
+        _this.infos.push(info);
+      };
+
+      for (var i = 0; i < numWorkers; i++) {
+        _loop(i);
+      }
+    }
+    /**
+     * Sends a binary message to a WebWorker.
+     */
+
+
+    callWorker(id, funcName, callback, message, userData) {
+      var transferObject = {
+        funcName: funcName,
+        callbackId: 'placeholder',
+        data: message
+      }; // We transfer the ownership of "message" to the worker. This means it can't point
+      // to a view of the Emscripten heap because the whole heap would get transferred!
+
+      this.workers[id].postMessage(transferObject, [message.buffer]);
+      this.infos[id].queue.push({
+        callback: callback,
+        userData: userData
+      });
+    }
+
+    findBestWorker() {
+      var best_id = -1;
+      var best = 1e9;
+
+      for (var i = 0; i < this.workers.length; i++) {
+        if (this.infos[i].queue.length < best) {
+          best_id = i;
+          best = this.infos[i].queue.length;
+        }
+      }
+
+      return best_id;
+    }
+
+    shortestQueueLength() {
+      var shortest = 1e9;
+
+      for (var info of this.infos) {
+        shortest = Math.min(shortest, info.queue.length);
+      }
+
+      return shortest;
+    }
+
+  }
 
   var MAX_LIGHTS = 32;
   var arrayToHeap = new Map([[Float32Array, 'HEAPF32'], [Uint32Array, 'HEAPU32'], [Uint16Array, 'HEAPU16'], [Uint8Array, 'HEAPU8']]);
@@ -2782,19 +2916,16 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
      */
     class Buffer {
       constructor(size) {
-        var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Float32Array;
-        this.ofs = void 0;
-        this.size = void 0;
-        this.type = void 0;
+        var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : Uint8Array;
         assertInteger(size / type.BYTES_PER_ELEMENT);
 
         if (size === 0) {
           throw new Error('Buffer size was zero');
         }
 
-        this.ofs = Module._malloc(size);
+        this.ptr = Module.umbraAlloc(size);
 
-        if (this.ofs === 0) {
+        if (this.ptr === 0) {
           throw new Error("Allocation of ".concat(size, " bytes failed."));
         }
 
@@ -2804,9 +2935,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
       }
 
       destroy() {
-        Module._free(this.ofs);
-
-        this.ofs = 0;
+        Module.umbraFree(this.ptr);
+        this.ptr = 0;
         this.size = 0;
       }
       /**
@@ -2818,9 +2948,9 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
       ensureSize(newSize) {
         if (this.size < newSize) {
           this.destroy();
-          this.ofs = Module._malloc(newSize);
+          this.ptr = Module.umbraAlloc(newSize);
 
-          if (this.ofs === 0) {
+          if (this.ptr === 0) {
             throw new Error("Buffer growth to ".concat(newSize, " bytes failed."));
           }
 
@@ -2829,27 +2959,19 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
       }
 
       floats() {
-        return new Float32Array(Module.HEAPF32.buffer, this.ofs, this.size / 4);
+        return new Float32Array(Module.HEAPF32.buffer, this.ptr, this.size / 4);
       }
 
       bytes() {
-        return new Uint8Array(Module.HEAPU8.buffer, this.ofs, this.size);
+        return new Uint8Array(Module.HEAPU8.buffer, this.ptr, this.size);
       }
 
     }
 
     class BufferView {
-      constructor(buffer) {
-        var start = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-        var size = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : buffer.size;
-        var type = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : buffer.type;
-        this.ofs = void 0;
-        this.start = void 0;
-        this.size = void 0;
-        this.type = void 0;
-        this.heapName = void 0;
-        this.ofs = buffer.ofs;
-        this.start = start;
+      constructor(ptr, size) {
+        var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Float32Array;
+        this.ptr = ptr;
         this.size = size;
         this.type = type;
         this.heapName = arrayToHeap.get(type);
@@ -2857,7 +2979,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
       getArray() {
         // eslint-disable-next-line new-cap
-        return new this.type(Module[this.heapName].buffer, this.ofs + this.start, this.size / this.type.BYTES_PER_ELEMENT);
+        return new this.type(Module[this.heapName].buffer, this.ptr, this.size / this.type.BYTES_PER_ELEMENT);
       }
 
     } // Struct field offsets are required for zero-copy interop
@@ -2879,18 +3001,14 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
     class Client {
       constructor() {
-        this.ptr = void 0;
-        this.configPtr = void 0;
-        this.configPtr = Module._malloc(Module.CONFIG_SIZE);
+        this.configPtr = Module.umbraAlloc(Module.CONFIG_SIZE);
         Module.configInit(this.configPtr);
         this.ptr = Module.clientCreate('UmbraJS', this.configPtr);
       }
 
       destroy() {
         Module.clientDestroy(this.ptr);
-
-        Module._free(this.configPtr);
-
+        Module.umbraFree(this.configPtr);
         this.ptr = 0;
       }
 
@@ -2898,8 +3016,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
     class NativeScene {
       constructor(ptr) {
-        this.ptr = void 0;
-        this.matrixBuffer = new Buffer(16 * 4);
+        this.matrixBuffer = new Buffer(16 * 4, Float32Array);
         this.infoBuffer = new Buffer(Module.sceneInfoSize);
         this.ptr = ptr;
       }
@@ -2916,8 +3033,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
       }
 
       getInfo() {
-        Module.sceneGetInfo(this.ptr, this.infoBuffer.ofs);
-        return Module.deserializeSceneInfo(this.infoBuffer.ofs);
+        Module.sceneGetInfo(this.ptr, this.infoBuffer.ptr);
+        return Module.deserializeSceneInfo(this.infoBuffer.ptr);
       }
 
       isConnected() {
@@ -2934,23 +3051,17 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }
 
         copyMat4(this.matrixBuffer.floats(), matrix);
-        Module.sceneSetTransform(this.ptr, this.matrixBuffer.ofs);
+        Module.sceneSetTransform(this.ptr, this.matrixBuffer.ptr);
       }
 
     }
 
     class View {
       constructor(ptr, runtimeAssets) {
-        this.ptr = void 0;
-        this.matrixBuffer = void 0;
-        this.vectorBuffer = void 0;
-        this.lightBuffer = void 0;
-        this.temp = void 0;
-        this.runtimeAssets = void 0;
         this.ptr = ptr;
-        this.matrixBuffer = new Buffer(16 * 4);
-        this.vectorBuffer = new Buffer(4 * 4);
-        this.lightBuffer = new Buffer(MAX_LIGHTS * 3 * 4);
+        this.matrixBuffer = new Buffer(16 * 4, Float32Array);
+        this.vectorBuffer = new Buffer(4 * 4, Float32Array);
+        this.lightBuffer = new Buffer(MAX_LIGHTS * 3 * 4, Float32Array);
         this.temp = undefined;
         this.runtimeAssets = runtimeAssets;
       }
@@ -3010,7 +3121,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           }
         }
 
-        Module.viewUpdateRendering(this.ptr, this.matrixBuffer.ofs, this.vectorBuffer.ofs, depthRange, matrixFormat, quality, this.lightBuffer.ofs, lights.length);
+        Module.viewUpdateRendering(this.ptr, this.matrixBuffer.ptr, this.vectorBuffer.ptr, depthRange, matrixFormat, quality, this.lightBuffer.ptr, lights.length);
       }
 
       getVisible(batchSize) {
@@ -3037,12 +3148,12 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           return new arrayType(heap.buffer, ptr + ofs, bufferWordSize - ofs / 4);
         };
 
-        var meshIDs = getView(Uint32Array, Module.HEAPU32, temp.ofs, renderableStructOffsets['mesh']);
-        var lodLevels = getView(Int32Array, Module.HEAP32, temp.ofs, renderableStructOffsets['lodLevel']);
-        var masks = getView(Uint32Array, Module.HEAPU32, temp.ofs, renderableStructOffsets['visibilityMask']); // const transforms = getView(Float32Array, Module.HEAPF32, temp.ofs, offsets['transform'])
+        var meshIDs = getView(Uint32Array, Module.HEAPU32, temp.ptr, renderableStructOffsets['mesh']);
+        var lodLevels = getView(Int32Array, Module.HEAP32, temp.ptr, renderableStructOffsets['lodLevel']);
+        var masks = getView(Uint32Array, Module.HEAPU32, temp.ptr, renderableStructOffsets['visibilityMask']); // const transforms = getView(Float32Array, Module.HEAPF32, temp.ofs, offsets['transform'])
 
-        var scenePointers = getView(Uint32Array, Module.HEAPU32, temp.ofs, renderableStructOffsets['scene']);
-        var count = Module.viewNextRenderables(this.ptr, temp.ofs, batchSize);
+        var scenePointers = getView(Uint32Array, Module.HEAPU32, temp.ptr, renderableStructOffsets['scene']);
+        var count = Module.viewNextRenderables(this.ptr, temp.ptr, batchSize);
         var output = [];
 
         for (var i = 0; i < count; i++) {
@@ -3066,20 +3177,17 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
     }
 
     class AssetLoad {
-      // TODO: Replace with a union container data types
-      constructor(ptr) {
-        this.ptr = void 0;
-        this.assetType = void 0;
-        this.type = void 0;
-        this.data = void 0;
+      constructor(ptr, assetUserPointer) {
         this.ptr = ptr;
         this.assetType = Module.assetLoadGetType(this.ptr);
         this.type = 'Load' + AssetType[this.assetType];
         this.data = {}; // Type specific asset data set from the outside
+
+        this.assetUserPointer = assetUserPointer;
       }
 
-      prepare(userPtr) {
-        Module.assetLoadPrepare(this.ptr, userPtr);
+      prepare() {
+        Module.assetLoadPrepare(this.ptr, this.assetUserPointer);
       }
 
       finish(result) {
@@ -3090,11 +3198,6 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
     class AssetUnload {
       constructor(ptr) {
-        this.ptr = void 0;
-        this.assetType = void 0;
-        this.type = void 0;
-        this.userPointer = void 0;
-        this.data = void 0;
         this.ptr = ptr;
         this.assetType = Module.assetUnloadGetType(this.ptr);
         this.type = 'Unload' + AssetType[this.assetType];
@@ -3107,165 +3210,43 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
     }
 
-    var vertexBufferMap = new Map([['position', new Buffer(4)], ['normal', new Buffer(4)], ['uv', new Buffer(4)], ['tangent', new Buffer(4)], ['index', new Buffer(4)]]);
-
-    function getBufferForAttribute(name, newSize, type) {
-      var buffer = vertexBufferMap.get(name);
-
-      if (buffer.size < newSize) {
-        if (buffer.size > 0) {
-          buffer.destroy();
-        }
-
-        buffer = new Buffer(newSize, type);
-        vertexBufferMap.set(name, buffer);
-      } else if (type) {
-        buffer.type = type;
-      }
-
-      return buffer;
-    }
-
-    class Loader {
-      // NOTE: These buffers get leaked but it doesn't matter since we will delete Emscripten's heap on shutdown anyway.
-      constructor(load) {
-        this.load = void 0;
-        this.info = void 0;
-        this.vertexBuffers = void 0;
-        this.load = load;
-        Module.meshLoadGetInfo(this.load.ptr, Loader.meshInfoBuffer.ofs);
-        this.info = Module.deserializeMeshInfo(Loader.meshInfoBuffer.ofs);
-      }
-
-      setBuffers(buffers) {
-        Loader.structBuffer.bytes().fill(0);
-        Loader.tempDataBuffer.bytes().fill(0);
-        Module.serializeElementBuffer(buffers.position.desc, Loader.structBuffer.ofs);
-        Module.serializeElementBuffer(buffers.index.desc, Loader.tempDataBuffer.ofs);
-
-        if ('uv' in buffers) {
-          Module.serializeElementBuffer(buffers.uv.desc, Loader.structBuffer.ofs + Module.elementBufferSize * 1);
-        }
-
-        if ('normal' in buffers) {
-          Module.serializeElementBuffer(buffers.normal.desc, Loader.structBuffer.ofs + Module.elementBufferSize * 2);
-        }
-
-        if ('tangent' in buffers) {
-          Module.serializeElementBuffer(buffers.tangent.desc, Loader.structBuffer.ofs + Module.elementBufferSize * 3);
-        }
-
-        if (!Module.meshStreamSetBuffers(this.load.ptr, Loader.structBuffer.ofs, Loader.tempDataBuffer.ofs)) {
-          console.log(buffers);
-          throw new Error('setBuffers failed');
-        }
-      }
-
-      loadNext() {
-        return Module.meshStreamNext(this.load.ptr, 0, 0);
-      }
-
-      done() {
-        return Module.meshStreamDone(this.load.ptr);
-      }
-
-      allocateBuffers() {
+    class Runtime {
+      constructor(client, _ref, _ref2) {
         var _this = this;
 
-        var indexBytes = this.info.numUniqueVertices < 1 << 16 ? 2 : 4; // prettier-ignore
-
-        var attrInfo = {
-          position: {
-            elemSize: Module.vertexAttributeGetElementByteSize(VertexAttribute.Position),
-            count: this.info.numUniqueVertices,
-            mask: 1 << VertexAttribute.Position,
-            type: Float32Array
-          },
-          uv: {
-            elemSize: Module.vertexAttributeGetElementByteSize(VertexAttribute.TextureCoordinate),
-            count: this.info.numUniqueVertices,
-            mask: 1 << VertexAttribute.TextureCoordinate,
-            type: Float32Array
-          },
-          normal: {
-            elemSize: Module.vertexAttributeGetElementByteSize(VertexAttribute.Normal),
-            count: this.info.numUniqueVertices,
-            mask: 1 << VertexAttribute.Normal,
-            type: Float32Array
-          },
-          tangent: {
-            elemSize: Module.vertexAttributeGetElementByteSize(VertexAttribute.Tangent),
-            count: this.info.numUniqueVertices,
-            mask: 1 << VertexAttribute.Tangent,
-            type: Float32Array
-          },
-          index: {
-            elemSize: indexBytes,
-            count: this.info.numIndices,
-            mask: 0xffffffff,
-            type: indexBytes === 2 ? Uint16Array : Uint32Array
-          }
-        };
-        var bufferSizes = {};
-        Object.keys(attrInfo).forEach(function (name) {
-          var byteSize = attrInfo[name].count * attrInfo[name].elemSize;
-          assertInteger(byteSize / attrInfo[name].type.BYTES_PER_ELEMENT);
-          bufferSizes[name] = byteSize;
-        });
-        var meshBuffers = {};
-        Object.keys(attrInfo).forEach(function (name) {
-          // Skip vertex attributes that aren't needed
-          if (!(_this.info.attributes & attrInfo[name].mask)) {
-            return;
-          }
-
-          var buffer = getBufferForAttribute(name, bufferSizes[name], attrInfo[name].type);
-          var desc = {};
-          desc.ptr = buffer.ofs; // Emscripten heap offset
-
-          desc.elementByteSize = attrInfo[name].elemSize; // Size of a single element
-
-          desc.elementCapacity = attrInfo[name].count; // Number of elements
-
-          desc.elementStride = attrInfo[name].elemSize; // Distance (in bytes) between consecutive elements
-
-          desc.flags = 0; // 0: cached memory, 1: uncached memory
-
-          meshBuffers[name] = {
-            data: new BufferView(buffer, 0, bufferSizes[name]),
-            desc: desc
-          };
-        });
-        return meshBuffers;
-      }
-
-    }
-
-    Loader.structBuffer = new Buffer(Module.elementBufferSize * VertexAttribute.Count, Uint8Array);
-    Loader.meshInfoBuffer = new Buffer(Module.meshInfoSize, Uint8Array);
-    Loader.tempDataBuffer = new Buffer(Module.elementBufferSize, Uint8Array);
-
-    class Runtime {
-      constructor(client, platformFeatures) {
-        var runtimeFlags = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+        var _ref$features = _ref.features,
+            features = _ref$features === void 0 ? {
+          textureSupportMask: 0,
+          formats: [],
+          srgb: false,
+          halfFloat: false
+        } : _ref$features,
+            _ref$flags = _ref.flags,
+            flags = _ref$flags === void 0 ? 0 : _ref$flags;
+        var _ref2$workerScriptURL = _ref2.workerScriptURL,
+            workerScriptURL = _ref2$workerScriptURL === void 0 ? 'UmbraPlayerWorker.js' : _ref2$workerScriptURL,
+            _ref2$numWorkers = _ref2.numWorkers,
+            numWorkers = _ref2$numWorkers === void 0 ? 2 : _ref2$numWorkers;
         this.assets = new Map();
-        this.client = void 0;
-        this.ptr = void 0;
-        this.platformFeatures = void 0;
         this.nextId = 1;
-        this.loader = undefined;
-        this.tempTextureBuffer = new Buffer(1024 * 1024, Uint8Array);
-        this.tempTranscodedBuffer = new Buffer(4, Uint8Array);
-        this.tempStreamingStateBuffer = new Buffer(Module.streamingStateSize, Uint8Array);
-        this.scratch = void 0;
-        this.debug = void 0;
-
+        this.tempTextureBuffer = new Buffer(1024 * 1024);
+        this.tempStreamingStateBuffer = new Buffer(Module.streamingStateSize);
+        this.stats = {
+          meshPipelineMemoryUse: 0,
+          texturePipelineMemoryUse: 0
+        };
+        this.limits = {
+          // A soft upper limit in bytes
+          maxPipelineMemoryUse: 50 * 1024 * 1024
+        };
+        this.pendingAssetLoads = new Map();
         /**
          * If no normal map formats are supported then force support for
          * BC5 so that textures get transcoded into an uncompressed format.
          */
+
         var normalFormats = TextureSupportFlags.ETC1 | TextureSupportFlags.ASTC | TextureSupportFlags.PVRTC1 | TextureSupportFlags.BC5;
-        var textureSupportMask = platformFeatures.textureSupportMask;
+        var textureSupportMask = features.textureSupportMask;
 
         if (!(textureSupportMask & normalFormats)) {
           textureSupportMask |= TextureSupportFlags.BC5 | TextureSupportFlags.BC4;
@@ -3277,17 +3258,23 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           localCacheDirectory: null,
           localCacheMaximumByteSize: 0
         }, 0);
-        this.ptr = Module.runtimeCreate(client.ptr, infoPtr, runtimeFlags);
-
-        Module._free(infoPtr);
-
-        this.platformFeatures = platformFeatures;
-        var size = Math.max(Module.meshInfoSize, Module.materialInfoSize, Module.textureInfoSize, Module.byteBufferSize);
-        this.scratch = new Buffer(size, Uint8Array);
+        this.ptr = Module.runtimeCreate(client.ptr, infoPtr, flags);
+        Module.umbraFree(infoPtr);
+        this.platformFeatures = features;
+        var scratchSize = Math.max(Module.meshInfoSize, Module.materialInfoSize, Module.textureInfoSize, Module.byteBufferSize);
+        this.scratch = new Buffer(scratchSize, Uint8Array);
         this.debug = {
           textureFormatsInUse: new Set(),
-          platformFeatures: platformFeatures
+          platformFeatures: features
         };
+
+        if (numWorkers < 1) {
+          throw new Error("numWorkers should be at least 1, was ".concat(numWorkers));
+        }
+
+        this.workerPool = new WorkerPool(numWorkers, workerScriptURL, function () {
+          return _this.ptr === 0;
+        });
       }
 
       destroy() {
@@ -3318,6 +3305,10 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return new NativeScene(scenePtr);
       }
 
+      setHandlers(handlers) {
+        this.handlers = handlers;
+      }
+
       createView() {
         var viewPtr = Module.viewCreate(this.ptr);
         return new View(viewPtr, this.assets);
@@ -3338,113 +3329,353 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         }
       }
 
-      *getAssetLoads() {
+      *launchAssetLoads() {
         var _this2 = this;
 
-        while (true) {
-          if (this.loader) {
-            if (this.loader.done()) {
-              var job = this.loader.load; // The buffers allocated by MeshLoader are handed over to the caller.
-
-              job.data.buffers = this.loader.vertexBuffers;
-              job.data.material = this.assets.get(this.loader.info.material);
-              job.data.bounds = [this.loader.info.bounds.mn, this.loader.info.bounds.mx];
-              this.loader = undefined;
-              yield job;
-            } else {
-              /**
-               * A mesh is still decompressing so we'll advance the decompression
-               * one step further and return the control to the caller for a timeout check.
-               */
-              if (!this.loader.loadNext()) {
-                throw new Error('loadNext failed');
-              }
-
-              yield undefined; // This processing step might have finished the decompression already, so loop back.
-
-              continue;
-            }
-          }
-
-          var loadPtr = Module.runtimeNextAssetLoad(this.ptr); // Terminate the generator when there are no more jobs to process.
+        var _loop = function* _loop() {
+          var loadPtr = Module.runtimeNextAssetLoad(_this2.ptr); // Terminate the generator when there are no more jobs to process.
 
           if (loadPtr === 0) {
-            return undefined;
-          }
+            return {
+              v: undefined
+            };
+          } // Assign the newly created AssetLoad its own user pointer right away
+          // so that we can call load.prepare() before handing it out to user.
 
-          var load = new AssetLoad(loadPtr);
+
+          var load = new AssetLoad(loadPtr, _this2.getNextUserPointer());
 
           if (load.type === 'LoadMaterial') {
-            Module.materialLoadGetInfo(load.ptr, this.scratch.ofs);
-            var info = Module.deserializeMaterialInfo(this.scratch.ofs);
-            var textureObjects = info.textures.filter(function (ptr) {
+            Module.materialLoadGetInfo(load.ptr, _this2.scratch.ptr);
+            var info = Module.deserializeMaterialInfo(_this2.scratch.ptr);
+            var texturePtrs = info.textures.filter(function (ptr) {
               return ptr !== Module.INVALID_USERPOINTER;
+            }); // All texture loads should've been started by now so the promises should exist
+
+            var pending = texturePtrs.map(function (id) {
+              return _this2.pendingAssetLoads.get(id);
+            }); // Catches errors and saves the texture load statuses to a list. All texture
+            // promises are waited for before materialPromise runs its executor.
+
+            var texturePromises = pending.map(function (p) {
+              return p["catch"](function (e) {
+                return e;
+              });
             });
-            textureObjects = textureObjects.map(function (id) {
-              return _this2.assets.get(id);
-            });
-            load.data = {
-              transparent: info.transparent,
-              textures: textureObjects
-            };
-            yield load;
+            var materialPromise = Promise.all(texturePromises).then(function (results) {
+              texturePtrs.forEach(function (id) {
+                return _this2.pendingAssetLoads["delete"](id);
+              });
+
+              for (var result of results) {
+                if (result !== AssetLoadResult.Success) {
+                  console.error('Texture promise failed: ', AssetLoadResult[result]);
+                  load.finish(AssetLoadResult.Failure);
+                  return AssetLoadResult.Failure;
+                }
+              } // Texture loads have finished so we can fetch the objects uploaded by user
+
+
+              var textureObjects = texturePtrs.map(function (id) {
+                return _this2.assets.get(id);
+              });
+              load.data = {
+                transparent: info.transparent,
+                textures: textureObjects
+              };
+
+              try {
+                var status = _this2.handlers['LoadMaterial'](load.data, load.assetUserPointer);
+
+                load.finish(status);
+                return status;
+              } catch (error) {
+                load.finish(AssetLoadResult.Failure);
+                throw error;
+              }
+            }); // .catch(reason => console.error('materialPromise failed!', reason))
+
+            load.prepare();
+
+            _this2.pendingAssetLoads.set(load.assetUserPointer, materialPromise);
+
+            yield undefined;
           } else if (load.type === 'LoadTexture') {
-            var infoPtr = this.scratch.ofs;
+            var infoPtr = _this2.scratch.ptr;
             Module.textureLoadGetInfo(load.ptr, infoPtr);
             var texture = Module.deserializeTextureInfo(infoPtr);
-            texture['mipByteSizes'] = [Module.textureGetMipmapLevelByteSize(infoPtr, 0)];
-            texture['mipByteOffsets'] = [Module.textureGetMipmapLevelOffset(infoPtr, 0)];
-            var buffer = this.tempTextureBuffer;
-            buffer.ensureSize(texture.dataByteSize);
-            Module.serializeByteBuffer({
-              ptr: buffer.ofs,
-              byteSize: texture.dataByteSize,
-              // The output buffer size must match the texture data size
-              flags: 0
-            }, this.scratch.ofs);
 
-            if (!Module.textureLoadGetData(load.ptr, this.scratch.ofs)) {
-              throw new Error("textureLoadGetData failed: ".concat(load.ptr, ", ").concat(buffer.ofs, ", ").concat(texture.dataByteSize, "/").concat(buffer.size));
-            }
+            var needsTranscoding = _this2.formatNeedsTranscoding(texture.format);
 
-            var bufferView = new BufferView(buffer, 0, texture.dataByteSize);
+            load.prepare(); // Save promise's "resolve" and "reject" function references so we can call
+            // them from the callback below or choose to instantly resolve them.
 
-            if (this.formatNeedsTranscoding(texture.format)) {
+            var resolveTexturePromise, rejectTexturePromise;
+            var promise = new Promise(function (resolve, reject) {
+              resolveTexturePromise = resolve;
+              rejectTexturePromise = reject;
+            })["catch"](function (status) {
+              console.log('LoadTexture promise failed with status ', AssetLoadResult[status]);
+            });
+
+            _this2.pendingAssetLoads.set(load.assetUserPointer, promise);
+
+            var textureLoadFinished = function textureLoadFinished(buffer, userData) {
               var _formatToArrayType;
 
-              texture = this.downsampleAndTranscodeTexture(texture, buffer, this.tempTranscodedBuffer);
+              var memoryUse = userData.memoryUse;
+              _this2.stats.texturePipelineMemoryUse -= memoryUse; // buffer is undefined on worker failure
+
+              if (typeof buffer === 'undefined') {
+                console.warn('Worker failed async texture load');
+                load.finish(AssetLoadResult.Failure);
+                rejectTexturePromise(AssetLoadResult.Failure);
+                return;
+              }
+
+              var ptr = Module.umbraAlloc(buffer.byteLength); // Int8Array.set(ArrayBuffer, ofs) works but ArrayBuffer is missing .length so we force the type
+
+              Module.HEAP8.set(buffer, ptr);
+              var result = Module.deserializeTextureLoadResult(ptr);
+              var umbraTexture = result.textureInfo;
               var formatToArrayType = (_formatToArrayType = {}, _defineProperty$1(_formatToArrayType, TextureFormat.RGBA32, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RGB565, Uint16Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG8, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG16F, Uint16Array), _formatToArrayType);
-              bufferView = new BufferView(this.tempTranscodedBuffer, 0, texture.dataByteSize);
-              bufferView.type = formatToArrayType[texture.format];
-            } // Convert internal enums to string constants
-            // info.format = Native.TextureFormat[info.format]
-            // info.colorSpace = Native.ColorSpace[info.colorSpace]
-            // info.textureType = Native.TextureType[info.textureType]
+              var pixelData = new BufferView(ptr + Module.textureLoadResultHeaderSize, umbraTexture.dataByteSize, Uint8Array);
+              pixelData.type = formatToArrayType[umbraTexture.format];
+              load.data.info = umbraTexture;
+              load.data.buffer = pixelData;
+              buffer = undefined;
+              var status = AssetLoadResult.Failure;
 
+              try {
+                status = _this2.handlers['LoadTexture'](load.data, load.assetUserPointer);
 
-            this.debug.textureFormatsInUse.add(texture.format);
-            load.data = {
-              info: texture,
-              buffer: bufferView
+                _this2.debug.textureFormatsInUse.add(umbraTexture.format);
+              } catch (error) {
+                load.finish(AssetLoadResult.Failure);
+                throw error;
+              }
+
+              load.finish(status);
+              Module.umbraFree(ptr);
+
+              if (status === AssetLoadResult.Success) {
+                resolveTexturePromise(status);
+              } else {
+                rejectTexturePromise(status);
+              }
             };
-            yield load;
+
+            if (needsTranscoding) {
+              var serSize = Module.textureLoadGetSerializedSize(load.ptr);
+              var headerSize = Module.textureLoadDispatchHeaderSize;
+              var textureLoadDispatchSize = serSize + headerSize;
+              var dispatchBuffer = new Buffer(textureLoadDispatchSize);
+              /*const result =*/
+
+              Module.convertAssetLoadToTextureDispatch(load.ptr, load.assetUserPointer, _this2.platformFeatures.textureSupportMask, _this2.platformFeatures.srgb, dispatchBuffer.ptr, dispatchBuffer.size); // We can't tell how big the transcoded texture will be but we assume it will be pretty
+              // much the same size as the input. Since both input and output textures can still stay
+              // allocated simultaneously, multiply the size with two two get a peak memory use estimate.
+
+              var memoryUseEstimate = textureLoadDispatchSize * 2;
+              _this2.stats.texturePipelineMemoryUse += memoryUseEstimate;
+
+              _this2.workerPool.callWorker(_this2.workerPool.findBestWorker(), 'loadTexture', textureLoadFinished, new Uint8Array(dispatchBuffer.bytes()), {
+                load: load,
+                memoryUse: memoryUseEstimate
+              });
+
+              dispatchBuffer.destroy();
+            } else {
+              var buffer = _this2.tempTextureBuffer;
+              buffer.ensureSize(texture.dataByteSize);
+              Module.serializeByteBuffer({
+                ptr: buffer.ptr,
+                byteSize: texture.dataByteSize,
+                flags: 0
+              }, _this2.scratch.ptr);
+
+              if (!Module.textureLoadGetData(load.ptr, _this2.scratch.ptr)) {
+                throw new Error("textureLoadGetData failed: ".concat(load.ptr, ", ").concat(buffer.ptr, ", ").concat(texture.dataByteSize, "/").concat(buffer.size));
+              }
+
+              var bufferView = new BufferView(buffer.ptr, texture.dataByteSize, buffer.type);
+              load.data = {
+                info: texture,
+                buffer: bufferView
+              };
+              var status = AssetLoadResult.Failure;
+
+              try {
+                status = _this2.handlers['LoadTexture'](load.data, load.assetUserPointer);
+              } catch (error) {
+                load.finish(AssetLoadResult.Failure);
+                throw error;
+              }
+
+              load.finish(status); // Instantly resolve the promise in the case we didn't need any transcoding.
+
+              if (status === AssetLoadResult.Success) {
+                resolveTexturePromise(status);
+              } else {
+                rejectTexturePromise(status);
+              }
+            }
+
+            yield undefined;
           } else if (load.type === 'LoadMesh') {
-            // Mesh jobs create decompression work that needs to be done first.
-            this.loader = new Loader(load);
-            this.loader.vertexBuffers = this.loader.allocateBuffers();
-            this.loader.setBuffers(this.loader.vertexBuffers);
+            var meshInfoBuffer = new Buffer(Module.meshInfoSize);
+            Module.meshLoadGetInfo(load.ptr, meshInfoBuffer.ptr);
+
+            var _info = Module.deserializeMeshInfo(meshInfoBuffer.ptr);
+
+            meshInfoBuffer.destroy();
+            meshInfoBuffer = undefined;
+            load.prepare();
+            var size = Module.meshLoadDispatchHeaderSize + Module.meshLoadGetSerializedSize(load.ptr);
+            var buf = new Buffer(size);
+
+            if ((buf.ptr & 0x0f) != 0) {
+              console.warn("buf.ofs wasn't aligned: ".concat(buf.ptr));
+            }
+
+            var desc = Module.convertAssetLoadToMeshDispatch(load.ptr, load.assetUserPointer, buf.ptr, buf.size);
+            var materialUserPointer = _info.material;
+
+            var _materialPromise = _this2.pendingAssetLoads.get(materialUserPointer);
+
+            if (typeof _materialPromise === 'undefined') {
+              console.error("Material UserPointer ".concat(materialUserPointer, " didn't have a promise"));
+            }
+
+            var meshLoadFinished = function meshLoadFinished(buffer, userData) {
+              var load = userData.load,
+                  desc = userData.desc,
+                  textures = userData.textures,
+                  memoryUse = userData.memoryUse;
+              _this2.stats.meshPipelineMemoryUse -= memoryUse;
+
+              if (typeof buffer === 'undefined') {
+                console.warn('Worker failed async mesh load');
+                load.finish(AssetLoadResult.Failure);
+                return;
+              }
+
+              var bufferByteSize = buffer.length * buffer.BYTES_PER_ELEMENT;
+              var ptr = Module.umbraAlloc(bufferByteSize);
+              Module.HEAP8.set(buffer, ptr);
+              buffer = undefined; // we won't be using "buffer" after we've copied it to the heap
+
+              var obj = Module.deserializeMeshLoadResult(ptr);
+              var failed = false;
+
+              if (obj.result !== AssetLoadResult.Success) {
+                console.error("asset load failed with ".concat(AssetLoadResult[obj.result]));
+                failed = true;
+              }
+
+              if (obj.assetLoad !== load.ptr) {
+                console.error("asset load ptr didn't match ".concat(obj.assetLoad, " vs ").concat(load.ptr));
+                failed = true;
+              }
+
+              if (failed) {
+                console.error('MeshLoadResult handler failed');
+                load.finish(AssetLoadResult.Failure);
+                Module.umbraFree(ptr);
+                return;
+              }
+
+              var basePtr = ptr + Module.meshLoadResultHeaderSize;
+              var bufferDescs = Module.meshLoadResultBuildUmbraBuffers(ptr, basePtr);
+              var attributeArrayType = {
+                position: Float32Array,
+                uv: Float32Array,
+                normal: Float32Array,
+                tangent: Float32Array,
+                index: bufferDescs.index.elementByteSize === 2 ? Uint16Array : Uint32Array
+              };
+              var meshAttributes = {};
+
+              for (var name of Object.keys(bufferDescs)) {
+                var vbuf = {};
+                var elemBuf = bufferDescs[name];
+                var attributeArraySize = elemBuf.elementCapacity * elemBuf.elementStride;
+                vbuf['data'] = new BufferView(elemBuf.ptr, attributeArraySize, attributeArrayType[name]);
+                vbuf['desc'] = elemBuf;
+                meshAttributes[name] = vbuf;
+              } // Wait for material load to finish (its textures may take time) and
+              // only then call the handler.
+
+
+              _materialPromise.then(function (value) {
+                var materialAsset = _this2.assets.get(materialUserPointer);
+
+                var meshData = {
+                  buffers: meshAttributes,
+                  material: materialAsset,
+                  bounds: [_info.bounds.mn, _info.bounds.mx]
+                };
+                load.data = meshData;
+                var status = AssetLoadResult.Failure;
+
+                try {
+                  // Finally we can call user's handler function
+                  status = _this2.handlers['LoadMesh'](load.data, load.assetUserPointer);
+                } catch (error) {
+                  load.finish(AssetLoadResult.Failure);
+                  throw error;
+                }
+
+                if (status === AssetLoadResult.Success) {
+                  Module.meshLoadFinishExternalWithLoadResultHeader(load.ptr, ptr, basePtr);
+                } else {
+                  load.finish(status);
+                  console.error('MeshLoad failed with', AssetLoadResult[status]);
+                }
+              }, function (reason) {
+                console.error('Material promise was rejected', reason);
+              })["finally"](function () {
+                Module.umbraFree(ptr);
+              });
+            }; // Increase memory use here and decrease it in the finish callback.
+
+
+            var memoryUse = buf.size + desc.byteSize + Module.meshLoadResultHeaderSize;
+            _this2.stats.meshPipelineMemoryUse += memoryUse;
+
+            var best = _this2.workerPool.findBestWorker(); // NOTE: We need to copy "buf" here because if "callWorker()" transfers the ownership
+            // its a must, and even if it doesn't, then it's much faster to transfer a small copy
+            // because otherwise the _whole heap_ would get copied over to a worker.
+            // See https://bugs.chromium.org/p/chromium/issues/detail?id=169705
+
+
+            _this2.workerPool.callWorker(best, 'loadMesh', meshLoadFinished, new Uint8Array(buf.bytes()), {
+              load: load,
+              desc: desc,
+              memoryUse: memoryUse
+            });
+
+            buf.destroy();
             yield undefined;
           } else {
             throw new Error("Job wasn't handled correctly");
           }
+        };
+
+        while (true) {
+          var _ret = yield* _loop();
+
+          if (_typeof$1(_ret) === "object") return _ret.v;
         }
       }
 
-      loadAssets(handlers, timeLimit) {
+      loadAssets(timeLimit) {
         var startTime = performance.now(); // First go and free up all pending assets
 
         for (var unload of this.getAssetUnloads()) {
-          handlers[unload.type](unload);
+          var asset = this.assets.get(unload.userPointer);
+          this.handlers[unload.type](asset, unload.userPointer);
+          unload.finish();
 
           if (performance.now() - startTime > timeLimit) {
             break;
@@ -3452,25 +3683,25 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         } // Process load jobs if there's still time left
 
 
-        for (var load of this.getAssetLoads()) {
-          // If job is 'undefined' it means a mesh is still decompressing
-          if (load) {
-            try {
-              handlers[load.type](load);
-            } catch (error) {
-              load.finish(AssetLoadResult.Failure);
-              throw error;
-            }
-          } // We always process at least one job before checking the time
-
-
+        for (var load of this.launchAssetLoads()) {
+          // We always process at least one job before checking the time
           if (performance.now() - startTime > timeLimit) {
+            break;
+          } // If every worker is busy then don't exceed the pipeline memory limit.
+          // This causes a bubble in the pipeline when very large decompression
+          // jobs consume all the pipeline memory. On the other hand, we crash if too
+          // much memory is used so something needs to be done.
+
+
+          var pipelineMemoryUsed = this.stats.meshPipelineMemoryUse + this.stats.texturePipelineMemoryUse;
+
+          if (this.workerPool.shortestQueueLength() > 0 && pipelineMemoryUsed >= this.limits.maxPipelineMemoryUse) {
             break;
           }
         }
       }
 
-      addAsset(asset) {
+      getNextUserPointer() {
         // AssetJob IDs are just an increasing 32-bit series
         var userPtr = this.nextId;
         this.nextId = this.nextId + 1 | 0;
@@ -3479,8 +3710,11 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           this.nextId = 1;
         }
 
-        this.assets.set(userPtr, asset);
         return userPtr;
+      }
+
+      addAsset(assetID, asset) {
+        this.assets.set(assetID, asset);
       }
       /**
        * Removes the asset reference of the stream out job.
@@ -3488,14 +3722,10 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
        */
 
 
-      removeAsset(job, asset) {
-        var id = job.userPointer;
-
+      removeAsset(id) {
         if (this.assets.has(id)) {
           this.assets["delete"](id);
         }
-
-        return id;
       }
 
       formatNeedsTranscoding(format) {
@@ -3537,46 +3767,9 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         return true;
       }
 
-      downsampleAndTranscodeTexture(info, buffer, outputBuffer) {
-        var newFormat = Module.getUncompressedFromBCFormat(info.format);
-
-        if (newFormat === TextureFormat.Count) {
-          throw new Error("Couldn't find a matching BC format");
-        } // If half float is not supported on this platform we need to make do with an 8-bit texture.
-
-
-        if (newFormat === TextureFormat.RG16F && !this.platformFeatures.halfFloat) {
-          newFormat = TextureFormat.RG8;
-        }
-
-        var outputSize = Module.getTextureByteSize(info.width, info.height, newFormat);
-        outputBuffer.ensureSize(outputSize);
-        var result = Module.downsampleAndTranscodeTexture(info.format, newFormat, info.width, info.height, buffer.ofs, info.dataByteSize, outputBuffer.ofs, outputBuffer.size);
-
-        if (!result.success) {
-          throw new Error("Texture transcoding failed. Input: ".concat(info.format, ", output: ").concat(newFormat, ", output size: ").concat(outputSize));
-        }
-
-        if (result.texture.format !== newFormat) {
-          throw new Error("Transcoded texture format was ".concat(result.texture.format, " instead of the expected ").concat(newFormat));
-        } // Create a new texture descriptor with updated properties and return it.
-
-
-        var info2 = Object.assign({}, info);
-        var desc = result.texture;
-        info2 = Object.assign(info2, {
-          format: desc.format,
-          width: desc.width,
-          height: desc.height,
-          dataByteSize: desc.dataByteSize,
-          mipByteSizes: [desc.dataByteSize]
-        });
-        return info2;
-      }
-
       getStreamingState() {
-        Module.runtimeGetStreamingState(this.ptr, this.tempStreamingStateBuffer.ofs);
-        return Module.deserializeStreamingState(this.tempStreamingStateBuffer.ofs);
+        Module.runtimeGetStreamingState(this.ptr, this.tempStreamingStateBuffer.ptr);
+        return Module.deserializeStreamingState(this.tempStreamingStateBuffer.ptr);
       }
 
       getStreamingProgress() {
@@ -3593,13 +3786,13 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
 
     return {
-      createRuntime: function createRuntime(features) {
-        return new Runtime(new Client(), features);
+      createRuntime: function createRuntime(config) {
+        return new Runtime(new Client(), config, Module.umbraLibraryConfig);
       }
     };
   };
 
-  // Generated at 2020-07-06 15:28:19
+  // Generated at 2020-07-14 16:33:24
   function wrapNativeFunctions(Module) {
     Object.assign(Module, {
       configInit: Module.cwrap('UmbraConfigInit', null, ['number']),
@@ -3662,17 +3855,10 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
   }
 
   /**
-   * These definitions are exported in 'index.ts'.
-   * See the API reference for more details:
-   *
-   *     https://github.com/UmbraSoftware/umbrajs/wiki/API-reference
-   *
-   */
-
-  /**
    * Returns a library instance that uses the Emscripten resources of "Module".
    */
-  function instantiate(Module) {
+
+  function instantiate(Module, config) {
     var lib = {};
     /**
      * Queries supported texture formats and also enables the relevant WebGL extensions.
@@ -3757,7 +3943,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
     }; // Access to the Emscripten module is needed for deinitialization
 
 
-    lib.nativeModule = Module; // Allow access to Runtime class
+    lib.nativeModule = Module;
+    lib.nativeModule['umbraLibraryConfig'] = config; // Allow access to Runtime class
 
     lib.createRuntime = create(Module).createRuntime;
 
@@ -3792,7 +3979,6 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
 
   var initUmbra = function initUmbra(config) {
-
     var defaults = {
       wasmURL: ''
     };
@@ -3800,7 +3986,8 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
     return new Promise(function (resolve, reject) {
       try {
         var redirectWasmURL = function redirectWasmURL(path, prefix) {
-          // If it's our wasm file, return a custom URL
+          // The main WASM file's URL must be changed here because it's loaded during startup
+          // using Emscripten's "locateFile()" API.
           if (path.endsWith('umbra.wasm') && config.wasmURL !== '') {
             return config.wasmURL;
           }
@@ -3819,7 +4006,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           };
 
           wrapNativeFunctions(Module);
-          resolve(instantiate(Module));
+          resolve(instantiate(Module, config));
         });
       } catch (e) {
         reject(e);
@@ -4471,40 +4658,20 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
       this.projScreenMatrix = new THREE.Matrix4();
       this.cameraWorldPosition = new THREE.Vector3();
       this.handlers = {
-        LoadMaterial: function (_LoadMaterial) {
-          function LoadMaterial(_x) {
-            return _LoadMaterial.apply(this, arguments);
-          }
+        LoadMaterial: function LoadMaterial(data, assetID) {
+          var material = data;
+          material.transparent = data.transparent ? true : false;
 
-          LoadMaterial.toString = function () {
-            return _LoadMaterial.toString();
-          };
+          _this.runtime.addAsset(assetID, material);
 
-          return LoadMaterial;
-        }(function (load) {
-          var material = load.data;
-          material.transparent = load.data.transparent ? true : false;
-          load.prepare(_this.runtime.addAsset(material));
-          load.finish(Assets.AssetLoadResult.Success);
-        }),
-        UnloadMaterial: function UnloadMaterial(unload) {
-          _this.runtime.removeAsset(unload, unload.data);
-
-          unload.finish();
+          return Assets.AssetLoadResult.Success;
         },
-        LoadTexture: function (_LoadTexture) {
-          function LoadTexture(_x2) {
-            return _LoadTexture.apply(this, arguments);
-          }
-
-          LoadTexture.toString = function () {
-            return _LoadTexture.toString();
-          };
-
-          return LoadTexture;
-        }(function (load) {
-          var info = load.data.info;
-          var buffer = load.data.buffer;
+        UnloadMaterial: function UnloadMaterial(asset, assetID) {
+          _this.runtime.removeAsset(assetID);
+        },
+        LoadTexture: function LoadTexture(data, assetID) {
+          var info = data.info;
+          var buffer = data.buffer;
           var glformat;
 
           if (ThreeFormats.hasOwnProperty(info.format)) {
@@ -4514,19 +4681,18 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           if (!glformat) {
             // Add a dummy object for unknown formats. They will appear as a solid black color.
             console.log('Unknown texture format', info.format);
-            load.prepare(_this.runtime.addAsset({
+
+            _this.runtime.addAsset(assetID, {
               isTexture: false
-            }));
-            load.finish(Assets.AssetLoadResult.Success);
-            return;
+            });
+
+            return Assets.AssetLoadResult.Success;
           }
 
           if (!_this.canFitInMemory(buffer.size)) {
-            load.finish(Assets.AssetLoadResult.OutOfMemory);
-
             _this.adjustQuality(0.8);
 
-            return;
+            return Assets.AssetLoadResult.OutOfMemory;
           }
 
           var tex = _this.makeTexture(info, buffer, glformat);
@@ -4559,36 +4725,25 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
           _this.assetSizes.set(tex, buffer.size);
 
-          load.prepare(_this.runtime.addAsset(tex));
-          load.finish(Assets.AssetLoadResult.Success);
-        }),
-        UnloadTexture: function UnloadTexture(unload) {
-          // Free texture data only if it's not a dummy texture
-          if (unload.data.isTexture) {
-            unload.data.dispose();
-          }
+          _this.runtime.addAsset(assetID, tex);
 
-          if (_this.assetSizes.has(unload.data)) {
-            _this.textureMemoryUsed -= _this.assetSizes.get(unload.data);
-
-            _this.assetSizes["delete"](unload.data);
-          }
-
-          _this.runtime.removeAsset(unload, unload.data);
-
-          unload.finish();
+          return Assets.AssetLoadResult.Success;
         },
-        LoadMesh: function (_LoadMesh) {
-          function LoadMesh(_x3) {
-            return _LoadMesh.apply(this, arguments);
+        UnloadTexture: function UnloadTexture(texture, assetID) {
+          // Free texture data only if it's not a dummy texture
+          if (texture.isTexture) {
+            texture.dispose();
           }
 
-          LoadMesh.toString = function () {
-            return _LoadMesh.toString();
-          };
+          if (_this.assetSizes.has(texture)) {
+            _this.textureMemoryUsed -= _this.assetSizes.get(texture);
 
-          return LoadMesh;
-        }(function (load) {
+            _this.assetSizes["delete"](texture);
+          }
+
+          _this.runtime.removeAsset(assetID);
+        },
+        LoadMesh: function LoadMesh(data, assetID) {
           /**
            * LoadMesh gives us all the vertex data in load.data.buffers.
            * The buffers are only valid during this handler, and the memory will be
@@ -4611,7 +4766,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           };
           var totalSize = 0;
           Object.keys(attribs).map(function (name) {
-            return load.data.buffers[name];
+            return data.buffers[name];
           }).forEach(function (buffer) {
             if (buffer) {
               totalSize += buffer.data.size;
@@ -4619,20 +4774,18 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
           });
 
           if (!_this.canFitInMemory(totalSize)) {
-            load.finish(Assets.AssetLoadResult.OutOfMemory);
-
             _this.adjustQuality(0.8);
 
-            return;
+            return Assets.AssetLoadResult.OutOfMemory;
           }
 
           var geometry = new THREE.BufferGeometry();
-          var indexArray = load.data.buffers['index'].data.getArray();
+          var indexArray = data.buffers['index'].data.getArray();
           var indices = Array.from(indexArray);
           geometry.setIndex(indices);
-          geometry.boundingSphere = makeBoundingSphere(load.data.bounds);
+          geometry.boundingSphere = makeBoundingSphere(data.bounds);
           Object.keys(attribs).forEach(function (name) {
-            var buffer = load.data.buffers[name];
+            var buffer = data.buffers[name];
 
             if (buffer) {
               var view = buffer.data;
@@ -4648,32 +4801,30 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
               }
             }
           });
-          var meshDescriptor = {
+          var mesh = {
             geometry: geometry,
-            materialDesc: load.data.material
+            materialDesc: data.material
           };
           _this.meshMemoryUsed += totalSize;
 
-          _this.assetSizes.set(meshDescriptor, totalSize);
+          _this.assetSizes.set(mesh, totalSize);
 
-          load.prepare(_this.runtime.addAsset(meshDescriptor));
-          load.finish(Assets.AssetLoadResult.Success);
-        }),
-        UnloadMesh: function UnloadMesh(unload) {
-          var meshDesc = unload.data;
+          _this.runtime.addAsset(assetID, mesh);
 
-          if (_this.assetSizes.has(unload.data)) {
-            _this.meshMemoryUsed -= _this.assetSizes.get(unload.data);
+          return Assets.AssetLoadResult.Success;
+        },
+        UnloadMesh: function UnloadMesh(mesh, assetID) {
+          if (_this.assetSizes.has(mesh)) {
+            _this.meshMemoryUsed -= _this.assetSizes.get(mesh);
 
-            _this.assetSizes["delete"](unload.data);
-          } // Tell Umbra's runtime that this asset doesn't exist anymore and finish the job
-
-
-          _this.runtime.removeAsset(unload, meshDesc); // Release three.js's resources
+            _this.assetSizes["delete"](mesh);
+          } // Tell Umbra's runtime that this asset doesn't exist anymore
 
 
-          meshDesc.geometry.dispose();
-          unload.finish();
+          _this.runtime.removeAsset(assetID); // Release three.js's resources
+
+
+          mesh.geometry.dispose();
         }
       };
       var context; // three.js r106 has no 'getContext'
@@ -4682,13 +4833,17 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         context = renderer.getContext();
       } else {
         context = renderer.context;
-      }
+      } // Query GL Context for supported extenions and fill platform features with that info
+
 
       var features = umbrajs.getPlatformFeatures(context); // Three.js does not support BC5 compressed formats so we manually disable them.
 
       features.textureSupportMask &= ~TextureSupportFlags.BC5;
       this.umbrajs = umbrajs;
-      this.runtime = umbrajs.createRuntime(features);
+      this.runtime = umbrajs.createRuntime({
+        features: features
+      });
+      this.runtime.setHandlers(this.handlers);
       this.renderer = renderer;
       this.features = features;
       this.startEventUpdate(1000 / 60);
@@ -4846,7 +5001,7 @@ define(['exports', 'three'], function (exports, THREE) { 'use strict';
         var start = performance.now();
         this.runtime.update();
         var updateTook = performance.now() - start;
-        this.runtime.loadAssets(this.handlers, timeBudget - updateTook);
+        this.runtime.loadAssets(timeBudget - updateTook);
         this.updateViews();
       }
 
