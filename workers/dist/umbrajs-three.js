@@ -2782,6 +2782,30 @@
     RayQueryFlags[RayQueryFlags["BackfaceCulling"] = 1] = "BackfaceCulling";
   })(RayQueryFlags || (RayQueryFlags = {}));
 
+  /*! *****************************************************************************
+  Copyright (c) Microsoft Corporation. All rights reserved.
+  Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+  this file except in compliance with the License. You may obtain a copy of the
+  License at http://www.apache.org/licenses/LICENSE-2.0
+
+  THIS CODE IS PROVIDED ON AN *AS IS* BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, EITHER EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY IMPLIED
+  WARRANTIES OR CONDITIONS OF TITLE, FITNESS FOR A PARTICULAR PURPOSE,
+  MERCHANTABLITY OR NON-INFRINGEMENT.
+
+  See the Apache Version 2.0 License for specific language governing permissions
+  and limitations under the License.
+  ***************************************************************************** */
+
+  function __awaiter(thisArg, _arguments, P, generator) {
+      return new (P || (P = Promise))(function (resolve, reject) {
+          function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+          function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+          function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+      });
+  }
+
 
 
   var Assets = /*#__PURE__*/Object.freeze({
@@ -2804,7 +2828,6 @@
       }
 
       var _loop = function _loop(i) {
-        // const worker = new Worker('../dist/UmbraPlayerWorker.js')
         var worker = new Worker(workerScriptURL);
 
         worker.onmessage = function (msg) {
@@ -2853,18 +2876,37 @@
      */
 
 
-    callWorker(id, funcName, callback, message, userData) {
+    callWorker(id, funcName, message, userData) {
+      var _this2 = this;
+
       var transferObject = {
         funcName: funcName,
-        callbackId: 'placeholder',
+        callbackId: '',
         data: message
       }; // We transfer the ownership of "message" to the worker. This means it can't point
       // to a view of the Emscripten heap because the whole heap would get transferred!
 
-      this.workers[id].postMessage(transferObject, [message.buffer]);
-      this.infos[id].queue.push({
-        callback: callback,
-        userData: userData
+      this.workers[id].postMessage(transferObject, [message.buffer]); // Wrap worker's onmessage callback in a promise that rejects if onerror was called.
+
+      return new Promise(function (resolve, reject) {
+        var callback = function callback(buffer, userData) {
+          if (typeof buffer === 'undefined') {
+            reject({
+              buffer: buffer,
+              userData: userData
+            });
+          } else {
+            resolve({
+              buffer: buffer,
+              userData: userData
+            });
+          }
+        };
+
+        _this2.infos[id].queue.push({
+          callback: callback,
+          userData: userData
+        });
       });
     }
 
@@ -3235,13 +3277,14 @@
         this.nextId = 1;
         this.tempTextureBuffer = new Buffer(1024 * 1024);
         this.tempStreamingStateBuffer = new Buffer(Module.streamingStateSize);
+        this.tempDispatchBuffer = new Buffer(1);
         this.stats = {
           meshPipelineMemoryUse: 0,
           texturePipelineMemoryUse: 0
         };
         this.limits = {
           // A soft upper limit in bytes
-          maxPipelineMemoryUse: 50 * 1024 * 1024
+          maxPipelineMemoryUse: 32 * 1024 * 1024
         };
         this.pendingAssetLoads = new Map();
         /**
@@ -3283,6 +3326,8 @@
 
       destroy() {
         this.tempTextureBuffer.destroy();
+        this.tempStreamingStateBuffer.destroy();
+        this.tempDispatchBuffer.destroy();
         this.scratch.destroy();
         Module.runtimeDestroy(this.ptr);
         this.client.destroy();
@@ -3333,344 +3378,301 @@
         }
       }
 
-      *launchAssetLoads() {
-        var _this2 = this;
+      dispatchTextureLoad(load) {
+        return __awaiter(this, void 0, void 0, function* () {
+          var infoPtr = this.scratch.ptr;
+          Module.textureLoadGetInfo(load.ptr, infoPtr);
+          var texture = Module.deserializeTextureInfo(infoPtr);
+          var needsTranscoding = this.formatNeedsTranscoding(texture.format);
+          load.prepare();
 
-        var _loop = function* _loop() {
-          var loadPtr = Module.runtimeNextAssetLoad(_this2.ptr); // Terminate the generator when there are no more jobs to process.
+          if (needsTranscoding) {
+            var _formatToArrayType;
 
-          if (loadPtr === 0) {
-            return {
-              v: undefined
-            };
-          } // Assign the newly created AssetLoad its own user pointer right away
-          // so that we can call load.prepare() before handing it out to user.
+            var serSize = Module.textureLoadGetSerializedSize(load.ptr);
+            var headerSize = Module.textureLoadDispatchHeaderSize;
+            var textureLoadDispatchSize = serSize + headerSize;
+            this.tempDispatchBuffer.ensureSize(textureLoadDispatchSize);
+            var dispatchBuffer = this.tempDispatchBuffer;
+            /*const result =*/
 
+            Module.convertAssetLoadToTextureDispatch(load.ptr, load.assetUserPointer, this.platformFeatures.textureSupportMask, this.platformFeatures.srgb, dispatchBuffer.ptr, textureLoadDispatchSize); // We can't tell how big the transcoded texture will be but we assume it will be pretty
+            // much the same size as the input. Since both input and output textures can still stay
+            // allocated simultaneously, multiply the size with two two get a peak memory use estimate.
 
-          var load = new AssetLoad(loadPtr, _this2.getNextUserPointer());
+            var memoryUseEstimate = textureLoadDispatchSize * 2;
+            this.stats.texturePipelineMemoryUse += memoryUseEstimate;
+            var best = this.workerPool.findBestWorker();
+            var buffer; // Launch the async worker transcode task
 
-          if (load.type === 'LoadMaterial') {
-            Module.materialLoadGetInfo(load.ptr, _this2.scratch.ptr);
-            var info = Module.deserializeMaterialInfo(_this2.scratch.ptr);
-            var texturePtrs = info.textures.filter(function (ptr) {
-              return ptr !== Module.INVALID_USERPOINTER;
-            }); // All texture loads should've been started by now so the promises should exist
+            try {
+              ;
 
-            var pending = texturePtrs.map(function (id) {
-              return _this2.pendingAssetLoads.get(id);
-            }); // Catches errors and saves the texture load statuses to a list. All texture
-            // promises are waited for before materialPromise runs its executor.
-
-            var texturePromises = pending.map(function (p) {
-              return p["catch"](function (e) {
-                return e;
-              });
-            });
-            var materialPromise = Promise.all(texturePromises).then(function (results) {
-              texturePtrs.forEach(function (id) {
-                return _this2.pendingAssetLoads["delete"](id);
-              });
-
-              for (var result of results) {
-                if (result !== AssetLoadResult.Success) {
-                  console.error('Texture promise failed: ', AssetLoadResult[result]);
-                  load.finish(AssetLoadResult.Failure);
-                  return AssetLoadResult.Failure;
-                }
-              } // Texture loads have finished so we can fetch the objects uploaded by user
-
-
-              var textureObjects = texturePtrs.map(function (id) {
-                return _this2.assets.get(id);
-              });
-              load.data = {
-                transparent: info.transparent,
-                textures: textureObjects
-              };
-
-              try {
-                var status = _this2.handlers['LoadMaterial'](load.data, load.assetUserPointer);
-
-                load.finish(status);
-                return status;
-              } catch (error) {
-                load.finish(AssetLoadResult.Failure);
-                throw error;
-              }
-            }); // .catch(reason => console.error('materialPromise failed!', reason))
-
-            load.prepare();
-
-            _this2.pendingAssetLoads.set(load.assetUserPointer, materialPromise);
-
-            yield undefined;
-          } else if (load.type === 'LoadTexture') {
-            var infoPtr = _this2.scratch.ptr;
-            Module.textureLoadGetInfo(load.ptr, infoPtr);
-            var texture = Module.deserializeTextureInfo(infoPtr);
-
-            var needsTranscoding = _this2.formatNeedsTranscoding(texture.format);
-
-            load.prepare(); // Save promise's "resolve" and "reject" function references so we can call
-            // them from the callback below or choose to instantly resolve them.
-
-            var resolveTexturePromise, rejectTexturePromise;
-            var promise = new Promise(function (resolve, reject) {
-              resolveTexturePromise = resolve;
-              rejectTexturePromise = reject;
-            })["catch"](function (status) {
-              console.log('LoadTexture promise failed with status ', AssetLoadResult[status]);
-            });
-
-            _this2.pendingAssetLoads.set(load.assetUserPointer, promise);
-
-            var textureLoadFinished = function textureLoadFinished(buffer, userData) {
-              var _formatToArrayType;
-
-              var memoryUse = userData.memoryUse;
-              _this2.stats.texturePipelineMemoryUse -= memoryUse; // buffer is undefined on worker failure
-
-              if (typeof buffer === 'undefined') {
-                console.warn('Worker failed async texture load');
-                load.finish(AssetLoadResult.Failure);
-                rejectTexturePromise(AssetLoadResult.Failure);
-                return;
-              }
-
-              var ptr = Module.umbraAlloc(buffer.byteLength); // Int8Array.set(ArrayBuffer, ofs) works but ArrayBuffer is missing .length so we force the type
-
-              Module.HEAP8.set(buffer, ptr);
-              var result = Module.deserializeTextureLoadResult(ptr);
-              var umbraTexture = result.textureInfo;
-              var formatToArrayType = (_formatToArrayType = {}, _defineProperty$1(_formatToArrayType, TextureFormat.RGBA32, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RGB565, Uint16Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG8, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG16F, Uint16Array), _formatToArrayType);
-              var pixelData = new BufferView(ptr + Module.textureLoadResultHeaderSize, umbraTexture.dataByteSize, Uint8Array);
-              pixelData.type = formatToArrayType[umbraTexture.format];
-              load.data.info = umbraTexture;
-              load.data.buffer = pixelData;
-              buffer = undefined;
-              var status = AssetLoadResult.Failure;
-
-              try {
-                status = _this2.handlers['LoadTexture'](load.data, load.assetUserPointer);
-
-                _this2.debug.textureFormatsInUse.add(umbraTexture.format);
-              } catch (error) {
-                load.finish(AssetLoadResult.Failure);
-                throw error;
-              }
-
-              load.finish(status);
-              Module.umbraFree(ptr);
-
-              if (status === AssetLoadResult.Success) {
-                resolveTexturePromise(status);
-              } else {
-                rejectTexturePromise(status);
-              }
-            };
-
-            if (needsTranscoding) {
-              var serSize = Module.textureLoadGetSerializedSize(load.ptr);
-              var headerSize = Module.textureLoadDispatchHeaderSize;
-              var textureLoadDispatchSize = serSize + headerSize;
-              var dispatchBuffer = new Buffer(textureLoadDispatchSize);
-              /*const result =*/
-
-              Module.convertAssetLoadToTextureDispatch(load.ptr, load.assetUserPointer, _this2.platformFeatures.textureSupportMask, _this2.platformFeatures.srgb, dispatchBuffer.ptr, dispatchBuffer.size); // We can't tell how big the transcoded texture will be but we assume it will be pretty
-              // much the same size as the input. Since both input and output textures can still stay
-              // allocated simultaneously, multiply the size with two two get a peak memory use estimate.
-
-              var memoryUseEstimate = textureLoadDispatchSize * 2;
-              _this2.stats.texturePipelineMemoryUse += memoryUseEstimate;
-
-              _this2.workerPool.callWorker(_this2.workerPool.findBestWorker(), 'loadTexture', textureLoadFinished, new Uint8Array(dispatchBuffer.bytes()), {
+              var _ref3 = yield this.workerPool.callWorker(best, 'loadTexture', new Uint8Array(dispatchBuffer.bytes()), // Copy the dispatch buffer
+              {
                 load: load,
                 memoryUse: memoryUseEstimate
               });
 
-              dispatchBuffer.destroy();
+              buffer = _ref3.buffer;
+            } catch (_ref4) {
+              var userData = _ref4.userData;
+              load.finish(AssetLoadResult.Failure);
+              throw AssetLoadResult.Failure;
+            }
+
+            this.stats.texturePipelineMemoryUse -= memoryUseEstimate;
+            var ptr = Module.umbraAlloc(buffer.byteLength); // Int8Array.set(ArrayBuffer, ofs) works but ArrayBuffer is missing .length so we force the type
+
+            Module.HEAP8.set(buffer, ptr);
+            var result = Module.deserializeTextureLoadResult(ptr);
+            var umbraTexture = result.textureInfo;
+            var formatToArrayType = (_formatToArrayType = {}, _defineProperty$1(_formatToArrayType, TextureFormat.RGBA32, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RGB565, Uint16Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG8, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG16F, Uint16Array), _formatToArrayType);
+            var pixelData = new BufferView(ptr + Module.textureLoadResultHeaderSize, umbraTexture.dataByteSize, Uint8Array);
+            pixelData.type = formatToArrayType[umbraTexture.format];
+            var textureData = {
+              info: umbraTexture,
+              buffer: pixelData
+            };
+            buffer = undefined;
+            var status = AssetLoadResult.Failure;
+
+            try {
+              status = this.handlers['LoadTexture'](textureData, load.assetUserPointer);
+              this.debug.textureFormatsInUse.add(umbraTexture.format);
+              load.finish(status);
+            } catch (error) {
+              load.finish(AssetLoadResult.Failure);
+              throw AssetLoadResult.Failure;
+            } finally {
+              Module.umbraFree(ptr);
+            }
+
+            return status;
+          } else {
+            var _buffer = this.tempTextureBuffer;
+
+            _buffer.ensureSize(texture.dataByteSize);
+
+            Module.serializeByteBuffer({
+              ptr: _buffer.ptr,
+              byteSize: texture.dataByteSize,
+              flags: 0
+            }, this.scratch.ptr);
+
+            if (!Module.textureLoadGetData(load.ptr, this.scratch.ptr)) {
+              throw new Error("textureLoadGetData failed: ".concat(load.ptr, ", ").concat(_buffer.ptr, ", ").concat(texture.dataByteSize, "/").concat(_buffer.size));
+            }
+
+            var bufferView = new BufferView(_buffer.ptr, texture.dataByteSize, _buffer.type);
+            var _textureData = {
+              info: texture,
+              buffer: bufferView
+            };
+            var _status = AssetLoadResult.Failure;
+
+            try {
+              _status = this.handlers['LoadTexture'](_textureData, load.assetUserPointer);
+            } catch (error) {
+              load.finish(AssetLoadResult.Failure);
+              throw error;
+            }
+
+            load.finish(_status); // Instantly resolve the promise in the case we didn't need any transcoding.
+
+            if (_status === AssetLoadResult.Success) {
+              return _status;
             } else {
-              var buffer = _this2.tempTextureBuffer;
-              buffer.ensureSize(texture.dataByteSize);
-              Module.serializeByteBuffer({
-                ptr: buffer.ptr,
-                byteSize: texture.dataByteSize,
-                flags: 0
-              }, _this2.scratch.ptr);
-
-              if (!Module.textureLoadGetData(load.ptr, _this2.scratch.ptr)) {
-                throw new Error("textureLoadGetData failed: ".concat(load.ptr, ", ").concat(buffer.ptr, ", ").concat(texture.dataByteSize, "/").concat(buffer.size));
-              }
-
-              var bufferView = new BufferView(buffer.ptr, texture.dataByteSize, buffer.type);
-              load.data = {
-                info: texture,
-                buffer: bufferView
-              };
-              var status = AssetLoadResult.Failure;
-
-              try {
-                status = _this2.handlers['LoadTexture'](load.data, load.assetUserPointer);
-              } catch (error) {
-                load.finish(AssetLoadResult.Failure);
-                throw error;
-              }
-
-              load.finish(status); // Instantly resolve the promise in the case we didn't need any transcoding.
-
-              if (status === AssetLoadResult.Success) {
-                resolveTexturePromise(status);
-              } else {
-                rejectTexturePromise(status);
-              }
+              throw _status;
             }
+          }
+        });
+      }
 
-            yield undefined;
-          } else if (load.type === 'LoadMesh') {
-            var meshInfoBuffer = new Buffer(Module.meshInfoSize);
-            Module.meshLoadGetInfo(load.ptr, meshInfoBuffer.ptr);
+      dispatchMaterialLoad(load) {
+        return __awaiter(this, void 0, void 0, function* () {
+          var _this2 = this;
 
-            var _info = Module.deserializeMeshInfo(meshInfoBuffer.ptr);
+          load.prepare();
+          Module.materialLoadGetInfo(load.ptr, this.scratch.ptr);
+          var info = Module.deserializeMaterialInfo(this.scratch.ptr);
+          var texturePtrs = info.textures.filter(function (ptr) {
+            return ptr !== Module.INVALID_USERPOINTER;
+          }); // All texture loads should've been started by now so the promises should exist
 
-            meshInfoBuffer.destroy();
-            meshInfoBuffer = undefined;
-            load.prepare();
-            var size = Module.meshLoadDispatchHeaderSize + Module.meshLoadGetSerializedSize(load.ptr);
-            var buf = new Buffer(size);
+          var pending = texturePtrs.map(function (id) {
+            return _this2.pendingAssetLoads.get(id);
+          }); // Catches errors and saves the texture load statuses to a list. All texture
+          // promises are waited for before materialPromise runs its executor.
 
-            if ((buf.ptr & 0x0f) != 0) {
-              console.warn("buf.ofs wasn't aligned: ".concat(buf.ptr));
+          var texturePromises = pending.map(function (p) {
+            return p["catch"](function (e) {
+              return e;
+            });
+          }); // First wait for all material's textures
+
+          var results = yield Promise.all(texturePromises);
+          texturePtrs.forEach(function (id) {
+            return _this2.pendingAssetLoads["delete"](id);
+          });
+
+          for (var result of results) {
+            if (result !== AssetLoadResult.Success) {
+              load.finish(AssetLoadResult.Failure);
+              throw AssetLoadResult.Failure;
             }
-
-            var desc = Module.convertAssetLoadToMeshDispatch(load.ptr, load.assetUserPointer, buf.ptr, buf.size);
-            var materialUserPointer = _info.material;
-
-            var _materialPromise = _this2.pendingAssetLoads.get(materialUserPointer);
-
-            if (typeof _materialPromise === 'undefined') {
-              console.error("Material UserPointer ".concat(materialUserPointer, " didn't have a promise"));
-            }
-
-            var meshLoadFinished = function meshLoadFinished(buffer, userData) {
-              var load = userData.load,
-                  desc = userData.desc,
-                  textures = userData.textures,
-                  memoryUse = userData.memoryUse;
-              _this2.stats.meshPipelineMemoryUse -= memoryUse;
-
-              if (typeof buffer === 'undefined') {
-                console.warn('Worker failed async mesh load');
-                load.finish(AssetLoadResult.Failure);
-                return;
-              }
-
-              var bufferByteSize = buffer.length * buffer.BYTES_PER_ELEMENT;
-              var ptr = Module.umbraAlloc(bufferByteSize);
-              Module.HEAP8.set(buffer, ptr);
-              buffer = undefined; // we won't be using "buffer" after we've copied it to the heap
-
-              var obj = Module.deserializeMeshLoadResult(ptr);
-              var failed = false;
-
-              if (obj.result !== AssetLoadResult.Success) {
-                console.error("asset load failed with ".concat(AssetLoadResult[obj.result]));
-                failed = true;
-              }
-
-              if (obj.assetLoad !== load.ptr) {
-                console.error("asset load ptr didn't match ".concat(obj.assetLoad, " vs ").concat(load.ptr));
-                failed = true;
-              }
-
-              if (failed) {
-                console.error('MeshLoadResult handler failed');
-                load.finish(AssetLoadResult.Failure);
-                Module.umbraFree(ptr);
-                return;
-              }
-
-              var basePtr = ptr + Module.meshLoadResultHeaderSize;
-              var bufferDescs = Module.meshLoadResultBuildUmbraBuffers(ptr, basePtr);
-              var attributeArrayType = {
-                position: Float32Array,
-                uv: Float32Array,
-                normal: Float32Array,
-                tangent: Float32Array,
-                index: bufferDescs.index.elementByteSize === 2 ? Uint16Array : Uint32Array
-              };
-              var meshAttributes = {};
-
-              for (var name of Object.keys(bufferDescs)) {
-                var vbuf = {};
-                var elemBuf = bufferDescs[name];
-                var attributeArraySize = elemBuf.elementCapacity * elemBuf.elementStride;
-                vbuf['data'] = new BufferView(elemBuf.ptr, attributeArraySize, attributeArrayType[name]);
-                vbuf['desc'] = elemBuf;
-                meshAttributes[name] = vbuf;
-              } // Wait for material load to finish (its textures may take time) and
-              // only then call the handler.
+          } // Texture loads have finished so we can fetch the objects uploaded by user
 
 
-              _materialPromise.then(function (value) {
-                var materialAsset = _this2.assets.get(materialUserPointer);
+          var textureObjects = texturePtrs.map(function (id) {
+            return _this2.assets.get(id);
+          });
+          var materialData = {
+            transparent: info.transparent,
+            textures: textureObjects
+          };
 
-                var meshData = {
-                  buffers: meshAttributes,
-                  material: materialAsset,
-                  bounds: [_info.bounds.mn, _info.bounds.mx]
-                };
-                load.data = meshData;
-                var status = AssetLoadResult.Failure;
+          try {
+            var status = this.handlers['LoadMaterial'](materialData, load.assetUserPointer);
+            load.finish(status);
+            return status;
+          } catch (error) {
+            load.finish(AssetLoadResult.Failure);
+            throw AssetLoadResult.Failure;
+          }
+        });
+      }
 
-                try {
-                  // Finally we can call user's handler function
-                  status = _this2.handlers['LoadMesh'](load.data, load.assetUserPointer);
-                } catch (error) {
-                  load.finish(AssetLoadResult.Failure);
-                  throw error;
-                }
+      dispatchMeshLoad(load) {
+        return __awaiter(this, void 0, void 0, function* () {
+          Module.meshLoadGetInfo(load.ptr, this.scratch.ptr);
+          var info = Module.deserializeMeshInfo(this.scratch.ptr);
+          load.prepare();
+          var size = Module.meshLoadDispatchHeaderSize + Module.meshLoadGetSerializedSize(load.ptr);
+          this.tempDispatchBuffer.ensureSize(size);
+          var buf = this.tempDispatchBuffer;
 
-                if (status === AssetLoadResult.Success) {
-                  Module.meshLoadFinishExternalWithLoadResultHeader(load.ptr, ptr, basePtr);
-                } else {
-                  load.finish(status);
-                  console.error('MeshLoad failed with', AssetLoadResult[status]);
-                }
-              }, function (reason) {
-                console.error('Material promise was rejected', reason);
-              })["finally"](function () {
-                Module.umbraFree(ptr);
-              });
-            }; // Increase memory use here and decrease it in the finish callback.
+          if ((buf.ptr & 0x0f) != 0) {
+            console.warn("buf.ptr wasn't aligned: ".concat(buf.ptr));
+          }
+
+          var desc = Module.convertAssetLoadToMeshDispatch(load.ptr, load.assetUserPointer, buf.ptr, size);
+          var materialUserPointer = info.material;
+          var materialPromise = this.pendingAssetLoads.get(materialUserPointer);
+
+          if (typeof materialPromise === 'undefined') {
+            console.error("Material UserPointer ".concat(materialUserPointer, " didn't have a promise"));
+            load.finish(AssetLoadResult.Failure);
+            throw AssetLoadResult.Failure;
+          } // Increase memory use here and decrease it in the finish callback.
 
 
-            var memoryUse = buf.size + desc.byteSize + Module.meshLoadResultHeaderSize;
-            _this2.stats.meshPipelineMemoryUse += memoryUse;
+          var memoryUse = size + desc.byteSize + Module.meshLoadResultHeaderSize;
+          this.stats.meshPipelineMemoryUse += memoryUse;
+          var best = this.workerPool.findBestWorker();
+          var buffer;
 
-            var best = _this2.workerPool.findBestWorker(); // NOTE: We need to copy "buf" here because if "callWorker()" transfers the ownership
+          try {
+            // NOTE: We need to copy "buf" here because if "callWorker()" transfers the ownership
             // its a must, and even if it doesn't, then it's much faster to transfer a small copy
             // because otherwise the _whole heap_ would get copied over to a worker.
             // See https://bugs.chromium.org/p/chromium/issues/detail?id=169705
+            ;
 
+            var _ref5 = yield this.workerPool.callWorker(best, 'loadMesh', new Uint8Array(buf.bytes()), {});
 
-            _this2.workerPool.callWorker(best, 'loadMesh', meshLoadFinished, new Uint8Array(buf.bytes()), {
-              load: load,
-              desc: desc,
-              memoryUse: memoryUse
-            });
-
-            buf.destroy();
-            yield undefined;
-          } else {
-            throw new Error("Job wasn't handled correctly");
+            buffer = _ref5.buffer;
+          } catch (obj) {
+            console.warn('Worker failed async mesh load');
+            load.finish(AssetLoadResult.Failure);
+            throw AssetLoadResult.Failure;
+          } finally {
+            this.stats.meshPipelineMemoryUse -= memoryUse;
           }
-        };
 
-        while (true) {
-          var _ret = yield* _loop();
+          var bufferByteSize = buffer.length * buffer.BYTES_PER_ELEMENT;
+          var ptr = Module.umbraAlloc(bufferByteSize);
+          Module.HEAP8.set(buffer, ptr);
+          buffer = undefined; // we won't be using "buffer" after we've copied it to the heap
 
-          if (_typeof$1(_ret) === "object") return _ret.v;
-        }
+          var obj = Module.deserializeMeshLoadResult(ptr);
+          var failed = false; // These errors should never happen
+
+          if (obj.result !== AssetLoadResult.Success) {
+            console.error("Asset load failed with ".concat(AssetLoadResult[obj.result]));
+            failed = true;
+          }
+
+          if (obj.assetLoad !== load.ptr) {
+            console.error("Asset load ptr didn't match ".concat(obj.assetLoad, " vs ").concat(load.ptr));
+            failed = true;
+          }
+
+          if (failed) {
+            Module.umbraFree(ptr);
+            load.finish(AssetLoadResult.Failure);
+            throw AssetLoadResult.Failure;
+          }
+
+          var basePtr = ptr + Module.meshLoadResultHeaderSize;
+          var bufferDescs = Module.meshLoadResultBuildUmbraBuffers(ptr, basePtr);
+          var attributeArrayType = {
+            position: Float32Array,
+            uv: Float32Array,
+            normal: Float32Array,
+            tangent: Float32Array,
+            index: bufferDescs.index.elementByteSize === 2 ? Uint16Array : Uint32Array
+          };
+          var meshAttributes = {};
+
+          for (var name of Object.keys(bufferDescs)) {
+            var vbuf = {};
+            var elemBuf = bufferDescs[name];
+            var attributeArraySize = elemBuf.elementCapacity * elemBuf.elementStride;
+            vbuf['data'] = new BufferView(elemBuf.ptr, attributeArraySize, attributeArrayType[name]);
+            vbuf['desc'] = elemBuf;
+            meshAttributes[name] = vbuf;
+          } // Wait for material load to finish (its textures may take time) and
+          // only then call the handler.
+
+
+          try {
+            yield materialPromise;
+          } catch (status) {
+            // On error, finish the mesh load with the same status as its dependency
+            load.finish(status);
+            Module.umbraFree(ptr);
+            throw status;
+          }
+
+          var materialAsset = this.assets.get(materialUserPointer);
+          var meshData = {
+            buffers: meshAttributes,
+            material: materialAsset,
+            bounds: [info.bounds.mn, info.bounds.mx]
+          };
+          var status = AssetLoadResult.Failure;
+
+          try {
+            // Finally we can call user's handler function
+            status = this.handlers['LoadMesh'](meshData, load.assetUserPointer);
+
+            if (status === AssetLoadResult.Success) {
+              Module.meshLoadFinishExternalWithLoadResultHeader(load.ptr, ptr, basePtr);
+            } else {
+              load.finish(status);
+              throw status;
+            }
+          } catch (error) {
+            // Handler threw an exception
+            load.finish(AssetLoadResult.Failure);
+            throw error;
+          } finally {
+            Module.umbraFree(ptr);
+          }
+
+          return status;
+        });
       }
 
       loadAssets(timeLimit) {
@@ -3686,23 +3688,40 @@
           }
         } // Process load jobs if there's still time left
 
+        do {
+          var loadPtr = Module.runtimeNextAssetLoad(this.ptr); // No more jobs to process?
 
-        for (var load of this.launchAssetLoads()) {
-          // We always process at least one job before checking the time
-          if (performance.now() - startTime > timeLimit) {
+          if (loadPtr === 0) {
             break;
-          } // If every worker is busy then don't exceed the pipeline memory limit.
+          }
+
+          var promise = void 0; // Assign the newly created AssetLoad its own user pointer right away
+          // so that we can call load.prepare() before handing it out to user.
+
+          var load = new AssetLoad(loadPtr, this.getNextUserPointer());
+
+          if (load.type === 'LoadTexture') {
+            promise = this.dispatchTextureLoad(load);
+          } else if (load.type === 'LoadMaterial') {
+            promise = this.dispatchMaterialLoad(load);
+          } else if (load.type === 'LoadMesh') {
+            // No-one waits for mesh loads to finish so we don't save its promise
+            this.dispatchMeshLoad(load);
+          }
+
+          if (typeof promise !== 'undefined') {
+            this.pendingAssetLoads.set(load.assetUserPointer, promise);
+          }
           // This causes a bubble in the pipeline when very large decompression
           // jobs consume all the pipeline memory. On the other hand, we crash if too
           // much memory is used so something needs to be done.
-
 
           var pipelineMemoryUsed = this.stats.meshPipelineMemoryUse + this.stats.texturePipelineMemoryUse;
 
           if (this.workerPool.shortestQueueLength() > 0 && pipelineMemoryUsed >= this.limits.maxPipelineMemoryUse) {
             break;
           }
-        }
+        } while (performance.now() - startTime < timeLimit);
       }
 
       getNextUserPointer() {
