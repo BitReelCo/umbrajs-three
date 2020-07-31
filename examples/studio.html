@@ -55,7 +55,7 @@
 
           // Initialize the library and create a three.js object that contains our scene
 
-          let Umbra = await UmbraRuntime.initWithThreeJS(renderer)
+          let Umbra = await UmbraRuntime.initWithThreeJS(renderer, {workerScriptURL: "../dist/UmbraPlayerWorker.js"})
 
           let scene = new THREE.Scene()
           scene.background = new THREE.Color(0x222222)
