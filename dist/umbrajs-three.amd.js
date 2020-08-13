@@ -1,4 +1,4 @@
-define(['module', 'exports', 'three'], function (module, exports, THREE) { 'use strict';
+define(['exports', 'three'], function (exports, THREE) { 'use strict';
 
   function _typeof(obj) {
     "@babel/helpers - typeof";
@@ -153,7 +153,8 @@ define(['module', 'exports', 'three'], function (module, exports, THREE) { 'use 
   }
 
   var UmbraNativeAPI = function () {
-    var _scriptDir = new URL(module.uri, document.baseURI).href;
+    var _scriptDir = typeof document !== 'undefined' && document.currentScript ? document.currentScript.src : undefined;
+
     return function (UmbraNativeAPI) {
       UmbraNativeAPI = UmbraNativeAPI || {};
       var c;
@@ -1374,7 +1375,7 @@ define(['module', 'exports', 'three'], function (module, exports, THREE) { 'use 
         C: function C() {
           return Sa.apply(null, arguments);
         },
-        O: function O() {},
+        N: function N() {},
         R: function R(a, b) {
           J = b;
 
@@ -1937,7 +1938,7 @@ define(['module', 'exports', 'three'], function (module, exports, THREE) { 'use 
         x: function x() {
           return 0;
         },
-        N: function N(a, b, d, e) {
+        M: function M(a, b, d, e) {
           try {
             var f = Wa.nc(a),
                 g = Wa.jc(f, b, d);
@@ -1950,7 +1951,7 @@ define(['module', 'exports', 'three'], function (module, exports, THREE) { 'use 
         D: function D() {
           return 0;
         },
-        M: function M(a, b, d, e) {
+        O: function O(a, b, d, e) {
           try {
             for (var f = 0, g = 0; g < d; g++) {
               for (var k = F[b + 8 * g >> 2], h = F[b + (8 * g + 4) >> 2], l = 0; l < h; l++) {
@@ -3872,6 +3873,267 @@ define(['module', 'exports', 'three'], function (module, exports, THREE) { 'use 
       sendInternalMessage: Module.cwrap('UmbraSendInternalMessage', 'number', ['number', 'number'])
     });
   }
+
+  // Generated at 2020-07-14 16:33:24
+  var MatrixFormat$1;
+
+  (function (MatrixFormat) {
+    MatrixFormat[MatrixFormat["ColumnMajor"] = 0] = "ColumnMajor";
+    MatrixFormat[MatrixFormat["RowMajor"] = 1] = "RowMajor";
+    MatrixFormat[MatrixFormat["Count"] = 2] = "Count";
+  })(MatrixFormat$1 || (MatrixFormat$1 = {}));
+
+  var TextureType$1;
+
+  (function (TextureType) {
+    TextureType[TextureType["Diffuse"] = 0] = "Diffuse";
+    TextureType[TextureType["Normal"] = 1] = "Normal";
+    TextureType[TextureType["Specular"] = 2] = "Specular";
+    TextureType[TextureType["MetaIndex"] = 3] = "MetaIndex";
+    TextureType[TextureType["Count"] = 4] = "Count";
+  })(TextureType$1 || (TextureType$1 = {}));
+
+  var TextureFormat$1;
+
+  (function (TextureFormat) {
+    TextureFormat[TextureFormat["RGBA32"] = 0] = "RGBA32";
+    TextureFormat[TextureFormat["RGB24"] = 1] = "RGB24";
+    TextureFormat[TextureFormat["BC1"] = 2] = "BC1";
+    TextureFormat[TextureFormat["BC3"] = 3] = "BC3";
+    TextureFormat[TextureFormat["BC4"] = 4] = "BC4";
+    TextureFormat[TextureFormat["BC5"] = 5] = "BC5";
+    TextureFormat[TextureFormat["ETC1_RGB"] = 6] = "ETC1_RGB";
+    TextureFormat[TextureFormat["RGBA_FLOAT32"] = 7] = "RGBA_FLOAT32";
+    TextureFormat[TextureFormat["UNC1"] = 8] = "UNC1";
+    TextureFormat[TextureFormat["JPEG"] = 9] = "JPEG";
+    TextureFormat[TextureFormat["PNG"] = 10] = "PNG";
+    TextureFormat[TextureFormat["BMP"] = 11] = "BMP";
+    TextureFormat[TextureFormat["PSD"] = 12] = "PSD";
+    TextureFormat[TextureFormat["TGA"] = 13] = "TGA";
+    TextureFormat[TextureFormat["GIF"] = 14] = "GIF";
+    TextureFormat[TextureFormat["HDR"] = 15] = "HDR";
+    TextureFormat[TextureFormat["PIC"] = 16] = "PIC";
+    TextureFormat[TextureFormat["PNM"] = 17] = "PNM";
+    TextureFormat[TextureFormat["ASTC_4X4"] = 18] = "ASTC_4X4";
+    TextureFormat[TextureFormat["ASTC_5X4"] = 19] = "ASTC_5X4";
+    TextureFormat[TextureFormat["ASTC_5X5"] = 20] = "ASTC_5X5";
+    TextureFormat[TextureFormat["ASTC_6X5"] = 21] = "ASTC_6X5";
+    TextureFormat[TextureFormat["ASTC_6X6"] = 22] = "ASTC_6X6";
+    TextureFormat[TextureFormat["ASTC_8X5"] = 23] = "ASTC_8X5";
+    TextureFormat[TextureFormat["ASTC_8X6"] = 24] = "ASTC_8X6";
+    TextureFormat[TextureFormat["ASTC_10X5"] = 25] = "ASTC_10X5";
+    TextureFormat[TextureFormat["ASTC_10X6"] = 26] = "ASTC_10X6";
+    TextureFormat[TextureFormat["ASTC_8X8"] = 27] = "ASTC_8X8";
+    TextureFormat[TextureFormat["ASTC_10X8"] = 28] = "ASTC_10X8";
+    TextureFormat[TextureFormat["ASTC_10X10"] = 29] = "ASTC_10X10";
+    TextureFormat[TextureFormat["ASTC_12X10"] = 30] = "ASTC_12X10";
+    TextureFormat[TextureFormat["ASTC_12X12"] = 31] = "ASTC_12X12";
+    TextureFormat[TextureFormat["ARGB32"] = 32] = "ARGB32";
+    TextureFormat[TextureFormat["R8"] = 33] = "R8";
+    TextureFormat[TextureFormat["PVRTC1_RGB4"] = 34] = "PVRTC1_RGB4";
+    TextureFormat[TextureFormat["PVRTC1_RGBA4"] = 35] = "PVRTC1_RGBA4";
+    TextureFormat[TextureFormat["UINT8"] = 36] = "UINT8";
+    TextureFormat[TextureFormat["UINT16"] = 37] = "UINT16";
+    TextureFormat[TextureFormat["UINT32"] = 38] = "UINT32";
+    TextureFormat[TextureFormat["RGB565"] = 39] = "RGB565";
+    TextureFormat[TextureFormat["RG8"] = 40] = "RG8";
+    TextureFormat[TextureFormat["RG16F"] = 41] = "RG16F";
+    TextureFormat[TextureFormat["OPENEXR"] = 42] = "OPENEXR";
+    TextureFormat[TextureFormat["RGBA_FLOAT16"] = 43] = "RGBA_FLOAT16";
+    TextureFormat[TextureFormat["RGB_FLOAT16"] = 44] = "RGB_FLOAT16";
+    TextureFormat[TextureFormat["RGB_FLOAT32"] = 45] = "RGB_FLOAT32";
+    TextureFormat[TextureFormat["Count"] = 46] = "Count";
+  })(TextureFormat$1 || (TextureFormat$1 = {}));
+
+  var ColorSpace$1;
+
+  (function (ColorSpace) {
+    ColorSpace[ColorSpace["Linear"] = 0] = "Linear";
+    ColorSpace[ColorSpace["SRGB"] = 1] = "SRGB";
+    ColorSpace[ColorSpace["Count"] = 2] = "Count";
+  })(ColorSpace$1 || (ColorSpace$1 = {}));
+
+  var VertexAttribute$1;
+
+  (function (VertexAttribute) {
+    VertexAttribute[VertexAttribute["Position"] = 0] = "Position";
+    VertexAttribute[VertexAttribute["TextureCoordinate"] = 1] = "TextureCoordinate";
+    VertexAttribute[VertexAttribute["Normal"] = 2] = "Normal";
+    VertexAttribute[VertexAttribute["Tangent"] = 3] = "Tangent";
+    VertexAttribute[VertexAttribute["Count"] = 4] = "Count";
+  })(VertexAttribute$1 || (VertexAttribute$1 = {}));
+
+  var BufferFlags$1;
+
+  (function (BufferFlags) {
+    BufferFlags[BufferFlags["UncachedMemory"] = 1] = "UncachedMemory";
+  })(BufferFlags$1 || (BufferFlags$1 = {}));
+
+  var LogLevel$1;
+
+  (function (LogLevel) {
+    LogLevel[LogLevel["Debug"] = 0] = "Debug";
+    LogLevel[LogLevel["Info"] = 1] = "Info";
+    LogLevel[LogLevel["Warning"] = 2] = "Warning";
+    LogLevel[LogLevel["Error"] = 3] = "Error";
+    LogLevel[LogLevel["Count"] = 4] = "Count";
+  })(LogLevel$1 || (LogLevel$1 = {}));
+
+  var TransferStatus$1;
+
+  (function (TransferStatus) {
+    TransferStatus[TransferStatus["Inactive"] = 0] = "Inactive";
+    TransferStatus[TransferStatus["Active"] = 1] = "Active";
+    TransferStatus[TransferStatus["Complete"] = 2] = "Complete";
+    TransferStatus[TransferStatus["Error"] = 3] = "Error";
+    TransferStatus[TransferStatus["Count"] = 4] = "Count";
+  })(TransferStatus$1 || (TransferStatus$1 = {}));
+
+  var HeaderError$1;
+
+  (function (HeaderError) {
+    HeaderError[HeaderError["Found"] = 0] = "Found";
+    HeaderError[HeaderError["Not_Found"] = 1] = "Not_Found";
+    HeaderError[HeaderError["Transfer_Not_Complete"] = 2] = "Transfer_Not_Complete";
+    HeaderError[HeaderError["Buffer_Too_Small"] = 3] = "Buffer_Too_Small";
+    HeaderError[HeaderError["Count"] = 4] = "Count";
+  })(HeaderError$1 || (HeaderError$1 = {}));
+
+  var HttpMethod$1;
+
+  (function (HttpMethod) {
+    HttpMethod[HttpMethod["Get"] = 0] = "Get";
+    HttpMethod[HttpMethod["Post"] = 1] = "Post";
+    HttpMethod[HttpMethod["Put"] = 2] = "Put";
+    HttpMethod[HttpMethod["Delete"] = 3] = "Delete";
+    HttpMethod[HttpMethod["Count"] = 4] = "Count";
+  })(HttpMethod$1 || (HttpMethod$1 = {}));
+
+  var LibraryInfo$1;
+
+  (function (LibraryInfo) {
+    LibraryInfo[LibraryInfo["Version"] = 0] = "Version";
+    LibraryInfo[LibraryInfo["Copyright"] = 1] = "Copyright";
+    LibraryInfo[LibraryInfo["BuildTime"] = 2] = "BuildTime";
+    LibraryInfo[LibraryInfo["BuildId"] = 3] = "BuildId";
+    LibraryInfo[LibraryInfo["Count"] = 4] = "Count";
+  })(LibraryInfo$1 || (LibraryInfo$1 = {}));
+
+  var InvalidUserPointer$1;
+
+  (function (InvalidUserPointer) {
+    InvalidUserPointer[InvalidUserPointer["InvalidUserPointer"] = 0] = "InvalidUserPointer";
+  })(InvalidUserPointer$1 || (InvalidUserPointer$1 = {}));
+
+  var TextureSupportFlags$1;
+
+  (function (TextureSupportFlags) {
+    TextureSupportFlags[TextureSupportFlags["None"] = 0] = "None";
+    TextureSupportFlags[TextureSupportFlags["BC1"] = 1] = "BC1";
+    TextureSupportFlags[TextureSupportFlags["BC2"] = 2] = "BC2";
+    TextureSupportFlags[TextureSupportFlags["BC3"] = 4] = "BC3";
+    TextureSupportFlags[TextureSupportFlags["BC4"] = 8] = "BC4";
+    TextureSupportFlags[TextureSupportFlags["BC5"] = 16] = "BC5";
+    TextureSupportFlags[TextureSupportFlags["BC6H"] = 32] = "BC6H";
+    TextureSupportFlags[TextureSupportFlags["BC7"] = 64] = "BC7";
+    TextureSupportFlags[TextureSupportFlags["ASTC"] = 128] = "ASTC";
+    TextureSupportFlags[TextureSupportFlags["ETC1"] = 256] = "ETC1";
+    TextureSupportFlags[TextureSupportFlags["ETC2"] = 512] = "ETC2";
+    TextureSupportFlags[TextureSupportFlags["EAC_R"] = 1024] = "EAC_R";
+    TextureSupportFlags[TextureSupportFlags["EAC_RG"] = 2048] = "EAC_RG";
+    TextureSupportFlags[TextureSupportFlags["PVRTC1"] = 4096] = "PVRTC1";
+    TextureSupportFlags[TextureSupportFlags["PVRTC2"] = 8192] = "PVRTC2";
+    TextureSupportFlags[TextureSupportFlags["ATC"] = 16384] = "ATC";
+    TextureSupportFlags[TextureSupportFlags["HalfFloat"] = 32768] = "HalfFloat";
+    TextureSupportFlags[TextureSupportFlags["Float"] = 65536] = "Float";
+    TextureSupportFlags[TextureSupportFlags["All"] = 2147483647] = "All";
+  })(TextureSupportFlags$1 || (TextureSupportFlags$1 = {}));
+
+  var RuntimeFlags$1;
+
+  (function (RuntimeFlags) {
+    RuntimeFlags[RuntimeFlags["NeverUnload"] = 1] = "NeverUnload";
+    RuntimeFlags[RuntimeFlags["ExclusiveRendering"] = 2] = "ExclusiveRendering";
+    RuntimeFlags[RuntimeFlags["EnableRayQueries"] = 4] = "EnableRayQueries";
+  })(RuntimeFlags$1 || (RuntimeFlags$1 = {}));
+
+  var ConnectionStatus$1;
+
+  (function (ConnectionStatus) {
+    ConnectionStatus[ConnectionStatus["Connected"] = 0] = "Connected";
+    ConnectionStatus[ConnectionStatus["Connecting"] = 1] = "Connecting";
+    ConnectionStatus[ConnectionStatus["ConnectionError"] = 2] = "ConnectionError";
+    ConnectionStatus[ConnectionStatus["Count"] = 3] = "Count";
+  })(ConnectionStatus$1 || (ConnectionStatus$1 = {}));
+
+  var DepthRange$1;
+
+  (function (DepthRange) {
+    DepthRange[DepthRange["ZeroToOne"] = 0] = "ZeroToOne";
+    DepthRange[DepthRange["MinusOneToOne"] = 1] = "MinusOneToOne";
+    DepthRange[DepthRange["Count"] = 2] = "Count";
+  })(DepthRange$1 || (DepthRange$1 = {}));
+
+  var FilterShapeType$1;
+
+  (function (FilterShapeType) {
+    FilterShapeType[FilterShapeType["Sphere"] = 0] = "Sphere";
+    FilterShapeType[FilterShapeType["Cylinder"] = 1] = "Cylinder";
+    FilterShapeType[FilterShapeType["None"] = 2] = "None";
+    FilterShapeType[FilterShapeType["Count"] = 3] = "Count";
+  })(FilterShapeType$1 || (FilterShapeType$1 = {}));
+
+  var SceneCopyStatus$1;
+
+  (function (SceneCopyStatus) {
+    SceneCopyStatus[SceneCopyStatus["InProgress"] = 0] = "InProgress";
+    SceneCopyStatus[SceneCopyStatus["Done"] = 1] = "Done";
+    SceneCopyStatus[SceneCopyStatus["Error"] = 2] = "Error";
+    SceneCopyStatus[SceneCopyStatus["Count"] = 3] = "Count";
+  })(SceneCopyStatus$1 || (SceneCopyStatus$1 = {}));
+
+  var SceneCopyDestinationType$1;
+
+  (function (SceneCopyDestinationType) {
+    SceneCopyDestinationType[SceneCopyDestinationType["File"] = 0] = "File";
+    SceneCopyDestinationType[SceneCopyDestinationType["Directory"] = 1] = "Directory";
+    SceneCopyDestinationType[SceneCopyDestinationType["Cloud"] = 2] = "Cloud";
+    SceneCopyDestinationType[SceneCopyDestinationType["FormatObj"] = 3] = "FormatObj";
+    SceneCopyDestinationType[SceneCopyDestinationType["Count"] = 4] = "Count";
+  })(SceneCopyDestinationType$1 || (SceneCopyDestinationType$1 = {}));
+
+  var SceneCopySourceType$1;
+
+  (function (SceneCopySourceType) {
+    SceneCopySourceType[SceneCopySourceType["Directory"] = 0] = "Directory";
+    SceneCopySourceType[SceneCopySourceType["Cloud"] = 1] = "Cloud";
+    SceneCopySourceType[SceneCopySourceType["Count"] = 2] = "Count";
+  })(SceneCopySourceType$1 || (SceneCopySourceType$1 = {}));
+
+  var AssetType$1;
+
+  (function (AssetType) {
+    AssetType[AssetType["Material"] = 0] = "Material";
+    AssetType[AssetType["Texture"] = 1] = "Texture";
+    AssetType[AssetType["Mesh"] = 2] = "Mesh";
+    AssetType[AssetType["Count"] = 3] = "Count";
+  })(AssetType$1 || (AssetType$1 = {}));
+
+  var AssetLoadResult$1;
+
+  (function (AssetLoadResult) {
+    AssetLoadResult[AssetLoadResult["Failure"] = 0] = "Failure";
+    AssetLoadResult[AssetLoadResult["OutOfMemory"] = 1] = "OutOfMemory";
+    AssetLoadResult[AssetLoadResult["Aborted"] = 2] = "Aborted";
+    AssetLoadResult[AssetLoadResult["Success"] = 3] = "Success";
+    AssetLoadResult[AssetLoadResult["Count"] = 4] = "Count";
+  })(AssetLoadResult$1 || (AssetLoadResult$1 = {}));
+
+  var RayQueryFlags$1;
+
+  (function (RayQueryFlags) {
+    RayQueryFlags[RayQueryFlags["BackfaceCulling"] = 1] = "BackfaceCulling";
+  })(RayQueryFlags$1 || (RayQueryFlags$1 = {}));
 
   /**
    * Returns a library instance that uses the Emscripten resources of "Module".

@@ -5,11 +5,11 @@ var l = {}, n;
 for (n in g) {
   g.hasOwnProperty(n) && (l[n] = g[n]);
 }
-var ba = "./this.program", q = !1, u = !1, v = !1, ca = !1, da = !1;
-q = "object" === typeof window;
+var aa = "./this.program", p = !1, u = !1, v = !1, ca = !1, da = !1;
+p = "object" === typeof window;
 u = "function" === typeof importScripts;
-v = (ca = "object" === typeof process && "object" === typeof process.versions && "string" === typeof process.versions.node) && !q && !u;
-da = !q && !v && !u;
+v = (ca = "object" === typeof process && "object" === typeof process.versions && "string" === typeof process.versions.node) && !p && !u;
+da = !p && !v && !u;
 var w = "", ea, fa, x, ha, ia;
 if (v) {
   w = __dirname + "/", ea = function(a, b) {
@@ -22,7 +22,7 @@ if (v) {
     a.buffer || (a = new Uint8Array(a));
     assert(a.buffer);
     return a;
-  }, 1 < process.argv.length && (ba = process.argv[1].replace(/\\/g, "/")), process.argv.slice(2), "undefined" !== typeof module && (module.exports = g), process.on("uncaughtException", function(a) {
+  }, 1 < process.argv.length && (aa = process.argv[1].replace(/\\/g, "/")), process.argv.slice(2), "undefined" !== typeof module && (module.exports = g), process.on("uncaughtException", function(a) {
     throw a;
   }), process.on("unhandledRejection", y), g.inspect = function() {
     return "[Emscripten Module object]";
@@ -40,7 +40,7 @@ if (v) {
       return a;
     }, "undefined" !== typeof print && ("undefined" === typeof console && (console = {}), console.log = print, console.warn = console.error = "undefined" !== typeof printErr ? printErr : print);
   } else {
-    if (q || u) {
+    if (p || u) {
       u ? w = self.location.href : document.currentScript && (w = document.currentScript.src), w = 0 !== w.indexOf("blob:") ? w.substr(0, w.lastIndexOf("/") + 1) : "", ea = function(a) {
         var b = new XMLHttpRequest;
         b.open("GET", a, !1);
@@ -70,7 +70,7 @@ for (n in l) {
   l.hasOwnProperty(n) && (g[n] = l[n]);
 }
 l = null;
-g.thisProgram && (ba = g.thisProgram);
+g.thisProgram && (aa = g.thisProgram);
 function ka(a) {
   la || (la = {});
   la[a] || (la[a] = 1, A(a));
@@ -78,7 +78,7 @@ function ka(a) {
 var la, B;
 g.wasmBinary && (B = g.wasmBinary);
 "object" !== typeof WebAssembly && A("no native wasm support detected");
-var C, ma = new WebAssembly.Table({initial:400, maximum:400, element:"anyfunc"}), D = !1;
+var C, ma = new WebAssembly.Table({initial:401, maximum:401, element:"anyfunc"}), F = !1;
 function assert(a, b) {
   a || y("Assertion failed: " + b);
 }
@@ -108,17 +108,20 @@ function G(a, b, c) {
   }
   return d;
 }
+function H(a) {
+  return a ? G(I, a, void 0) : "";
+}
 "undefined" !== typeof TextDecoder && new TextDecoder("utf-16le");
 function oa(a) {
   0 < a % 65536 && (a += 65536 - a % 65536);
   return a;
 }
-var buffer, H, I, J;
+var buffer, J, I, K;
 function pa(a) {
   buffer = a;
-  g.HEAP8 = H = new Int8Array(a);
+  g.HEAP8 = J = new Int8Array(a);
   g.HEAP16 = new Int16Array(a);
-  g.HEAP32 = J = new Int32Array(a);
+  g.HEAP32 = K = new Int32Array(a);
   g.HEAPU8 = I = new Uint8Array(a);
   g.HEAPU16 = new Uint16Array(a);
   g.HEAPU32 = new Uint32Array(a);
@@ -130,7 +133,7 @@ g.wasmMemory ? C = g.wasmMemory : C = new WebAssembly.Memory({initial:qa / 65536
 C && (buffer = C.buffer);
 qa = buffer.byteLength;
 pa(buffer);
-J[5852] = 5266448;
+K[7860] = 5274480;
 function ra(a) {
   for (; 0 < a.length;) {
     var b = a.shift();
@@ -147,17 +150,17 @@ function ya() {
   var a = g.preRun.shift();
   sa.unshift(a);
 }
-var za = Math.abs, Aa = Math.ceil, Ba = Math.floor, Ca = Math.min, K = 0, Da = null, L = null;
+var za = Math.abs, Aa = Math.ceil, Ba = Math.floor, Ca = Math.min, L = 0, Da = null, M = null;
 function Ea() {
-  K++;
-  g.monitorRunDependencies && g.monitorRunDependencies(K);
+  L++;
+  g.monitorRunDependencies && g.monitorRunDependencies(L);
 }
 function Fa() {
-  K--;
-  g.monitorRunDependencies && g.monitorRunDependencies(K);
-  if (0 == K && (null !== Da && (clearInterval(Da), Da = null), L)) {
-    var a = L;
-    L = null;
+  L--;
+  g.monitorRunDependencies && g.monitorRunDependencies(L);
+  if (0 == L && (null !== Da && (clearInterval(Da), Da = null), M)) {
+    var a = M;
+    M = null;
     a();
   }
 }
@@ -169,17 +172,17 @@ function y(a) {
   }
   ja(a);
   A(a);
-  D = !0;
+  F = !0;
   throw new WebAssembly.RuntimeError("abort(" + a + "). Build with -s ASSERTIONS=1 for more info.");
 }
 function Ga() {
-  var a = M;
+  var a = N;
   return String.prototype.startsWith ? a.startsWith("data:application/octet-stream;base64,") : 0 === a.indexOf("data:application/octet-stream;base64,");
 }
-var M = "UmbraPlayerWorker.wasm";
+var N = "UmbraPlayerWorker.wasm";
 if (!Ga()) {
-  var Ha = M;
-  M = g.locateFile ? g.locateFile(Ha, w) : w + Ha;
+  var Ha = N;
+  N = g.locateFile ? g.locateFile(Ha, w) : w + Ha;
 }
 function Ia() {
   try {
@@ -187,7 +190,7 @@ function Ia() {
       return new Uint8Array(B);
     }
     if (x) {
-      return x(M);
+      return x(N);
     }
     throw "both async and sync fetching of the wasm failed";
   } catch (a) {
@@ -195,20 +198,20 @@ function Ia() {
   }
 }
 function Ja() {
-  return B || !q && !u || "function" !== typeof fetch ? new Promise(function(a) {
+  return B || !p && !u || "function" !== typeof fetch ? new Promise(function(a) {
     a(Ia());
-  }) : fetch(M, {credentials:"same-origin"}).then(function(a) {
+  }) : fetch(N, {credentials:"same-origin"}).then(function(a) {
     if (!a.ok) {
-      throw "failed to load wasm binary file at '" + M + "'";
+      throw "failed to load wasm binary file at '" + N + "'";
     }
     return a.arrayBuffer();
   }).catch(function() {
     return Ia();
   });
 }
-var N, Ka;
+var P, Ka;
 ta.push({m:function() {
-  Ma();
+  La();
 }});
 function Na(a, b) {
   va.unshift({m:a, s:b});
@@ -275,7 +278,7 @@ function Ua(a, b) {
 var Wa = {open:function(a) {
   var b = Ta[a.node.rdev];
   if (!b) {
-    throw new O(43);
+    throw new Q(43);
   }
   a.tty = b;
   a.seekable = !1;
@@ -285,16 +288,16 @@ var Wa = {open:function(a) {
   a.tty.D.flush(a.tty);
 }, read:function(a, b, c, d) {
   if (!a.tty || !a.tty.D.ta) {
-    throw new O(60);
+    throw new Q(60);
   }
   for (var f = 0, h = 0; h < d; h++) {
     try {
       var k = a.tty.D.ta(a.tty);
     } catch (m) {
-      throw new O(29);
+      throw new Q(29);
     }
     if (void 0 === k && 0 === f) {
-      throw new O(6);
+      throw new Q(6);
     }
     if (null === k || void 0 === k) {
       break;
@@ -306,14 +309,14 @@ var Wa = {open:function(a) {
   return f;
 }, write:function(a, b, c, d) {
   if (!a.tty || !a.tty.D.ja) {
-    throw new O(60);
+    throw new Q(60);
   }
   try {
     for (var f = 0; f < d; f++) {
       a.tty.D.ja(a.tty, b[c + f]);
     }
   } catch (h) {
-    throw new O(29);
+    throw new Q(29);
   }
   d && (a.node.timestamp = Date.now());
   return f;
@@ -349,15 +352,15 @@ var Wa = {open:function(a) {
   null === b || 10 === b ? (A(G(a.output, 0)), a.output = []) : 0 != b && a.output.push(b);
 }, flush:function(a) {
   a.output && 0 < a.output.length && (A(G(a.output, 0)), a.output = []);
-}}, Q = {j:null, o:function() {
-  return Q.createNode(null, "/", 16895, 0);
+}}, R = {j:null, o:function() {
+  return R.createNode(null, "/", 16895, 0);
 }, createNode:function(a, b, c, d) {
   if (24576 === (c & 61440) || 4096 === (c & 61440)) {
-    throw new O(63);
+    throw new Q(63);
   }
-  Q.j || (Q.j = {dir:{node:{u:Q.f.u, l:Q.f.l, lookup:Q.f.lookup, R:Q.f.R, rename:Q.f.rename, unlink:Q.f.unlink, rmdir:Q.f.rmdir, readdir:Q.f.readdir, symlink:Q.f.symlink}, stream:{v:Q.g.v}}, file:{node:{u:Q.f.u, l:Q.f.l}, stream:{v:Q.g.v, read:Q.g.read, write:Q.g.write, na:Q.g.na, va:Q.g.va, X:Q.g.X}}, link:{node:{u:Q.f.u, l:Q.f.l, readlink:Q.f.readlink}, stream:{}}, oa:{node:{u:Q.f.u, l:Q.f.l}, stream:$a}});
+  R.j || (R.j = {dir:{node:{u:R.f.u, l:R.f.l, lookup:R.f.lookup, R:R.f.R, rename:R.f.rename, unlink:R.f.unlink, rmdir:R.f.rmdir, readdir:R.f.readdir, symlink:R.f.symlink}, stream:{v:R.g.v}}, file:{node:{u:R.f.u, l:R.f.l}, stream:{v:R.g.v, read:R.g.read, write:R.g.write, na:R.g.na, va:R.g.va, X:R.g.X}}, link:{node:{u:R.f.u, l:R.f.l, readlink:R.f.readlink}, stream:{}}, oa:{node:{u:R.f.u, l:R.f.l}, stream:$a}});
   c = ab(a, b, c, d);
-  16384 === (c.mode & 61440) ? (c.f = Q.j.dir.node, c.g = Q.j.dir.stream, c.c = {}) : 32768 === (c.mode & 61440) ? (c.f = Q.j.file.node, c.g = Q.j.file.stream, c.h = 0, c.c = null) : 40960 === (c.mode & 61440) ? (c.f = Q.j.link.node, c.g = Q.j.link.stream) : 8192 === (c.mode & 61440) && (c.f = Q.j.oa.node, c.g = Q.j.oa.stream);
+  16384 === (c.mode & 61440) ? (c.f = R.j.dir.node, c.g = R.j.dir.stream, c.c = {}) : 32768 === (c.mode & 61440) ? (c.f = R.j.file.node, c.g = R.j.file.stream, c.h = 0, c.c = null) : 40960 === (c.mode & 61440) ? (c.f = R.j.link.node, c.g = R.j.link.stream) : 8192 === (c.mode & 61440) && (c.f = R.j.oa.node, c.g = R.j.oa.stream);
   c.timestamp = Date.now();
   a && (a.c[b] = c);
   return c;
@@ -414,11 +417,11 @@ var Wa = {open:function(a) {
 }, l:function(a, b) {
   void 0 !== b.mode && (a.mode = b.mode);
   void 0 !== b.timestamp && (a.timestamp = b.timestamp);
-  void 0 !== b.size && Q.Pa(a, b.size);
+  void 0 !== b.size && R.Pa(a, b.size);
 }, lookup:function() {
   throw bb[44];
 }, R:function(a, b, c, d) {
-  return Q.createNode(a, b, c, d);
+  return R.createNode(a, b, c, d);
 }, rename:function(a, b, c) {
   if (16384 === (a.mode & 61440)) {
     try {
@@ -427,7 +430,7 @@ var Wa = {open:function(a) {
     }
     if (d) {
       for (var f in d.c) {
-        throw new O(55);
+        throw new Q(55);
       }
     }
   }
@@ -440,7 +443,7 @@ var Wa = {open:function(a) {
 }, rmdir:function(a, b) {
   var c = cb(a, b), d;
   for (d in c.c) {
-    throw new O(55);
+    throw new Q(55);
   }
   delete a.c[b];
 }, readdir:function(a) {
@@ -450,12 +453,12 @@ var Wa = {open:function(a) {
   }
   return b;
 }, symlink:function(a, b, c) {
-  a = Q.createNode(a, b, 41471, 0);
+  a = R.createNode(a, b, 41471, 0);
   a.link = c;
   return a;
 }, readlink:function(a) {
   if (40960 !== (a.mode & 61440)) {
-    throw new O(28);
+    throw new Q(28);
   }
   return a.link;
 }}, g:{read:function(a, b, c, d, f) {
@@ -473,7 +476,7 @@ var Wa = {open:function(a) {
   }
   return a;
 }, write:function(a, b, c, d, f, h) {
-  b.buffer === H.buffer && (h = !1);
+  b.buffer === J.buffer && (h = !1);
   if (!d) {
     return 0;
   }
@@ -490,7 +493,7 @@ var Wa = {open:function(a) {
       return a.c.set(b.subarray(c, c + d), f), d;
     }
   }
-  Q.pa(a, f + d);
+  R.pa(a, f + d);
   if (a.c.subarray && b.subarray) {
     a.c.set(b.subarray(c, c + d), f);
   } else {
@@ -503,15 +506,15 @@ var Wa = {open:function(a) {
 }, v:function(a, b, c) {
   1 === c ? b += a.position : 2 === c && 32768 === (a.node.mode & 61440) && (b += a.node.h);
   if (0 > b) {
-    throw new O(28);
+    throw new Q(28);
   }
   return b;
 }, na:function(a, b, c) {
-  Q.pa(a.node, b + c);
+  R.pa(a.node, b + c);
   a.node.h = Math.max(a.node.h, b + c);
 }, va:function(a, b, c, d, f, h, k) {
   if (32768 !== (a.node.mode & 61440)) {
-    throw new O(43);
+    throw new Q(43);
   }
   c = a.node.c;
   if (k & 2 || c.buffer !== b.buffer) {
@@ -519,27 +522,27 @@ var Wa = {open:function(a) {
       c.subarray ? c = c.subarray(f, f + d) : c = Array.prototype.slice.call(c, f, f + d);
     }
     a = !0;
-    f = b.buffer == H.buffer;
+    f = b.buffer == J.buffer;
     d = db(d);
     if (!d) {
-      throw new O(48);
+      throw new Q(48);
     }
-    (f ? H : b).set(c, d);
+    (f ? J : b).set(c, d);
   } else {
     a = !1, d = c.byteOffset;
   }
   return {wb:d, Da:a};
 }, X:function(a, b, c, d, f) {
   if (32768 !== (a.node.mode & 61440)) {
-    throw new O(43);
+    throw new Q(43);
   }
   if (f & 2) {
     return 0;
   }
-  Q.g.write(a, b, 0, d, c, !1);
+  R.g.write(a, b, 0, d, c, !1);
   return 0;
-}}}, eb = null, fb = {}, R = [], gb = 1, S = null, hb = !0, ib = {}, O = null, bb = {};
-function T(a, b) {
+}}}, eb = null, fb = {}, S = [], gb = 1, T = null, hb = !0, ib = {}, Q = null, bb = {};
+function U(a, b) {
   a = Sa("/", a);
   b = b || {};
   if (!a) {
@@ -550,7 +553,7 @@ function T(a, b) {
     void 0 === b[d] && (b[d] = c[d]);
   }
   if (8 < b.ka) {
-    throw new O(32);
+    throw new Q(32);
   }
   a = Oa(a.split("/").filter(function(a) {
     return !!a;
@@ -567,8 +570,8 @@ function T(a, b) {
     f.S && (!h || h && b.ra) && (f = f.S.root);
     if (!h || b.qa) {
       for (h = 0; 40960 === (f.mode & 61440);) {
-        if (f = jb(c), c = Sa(Qa(c), f), f = T(c, {ka:b.ka}).node, 40 < h++) {
-          throw new O(32);
+        if (f = jb(c), c = Sa(Qa(c), f), f = U(c, {ka:b.ka}).node, 40 < h++) {
+          throw new Q(32);
         }
       }
     }
@@ -588,19 +591,19 @@ function lb(a, b) {
   for (var c = 0, d = 0; d < b.length; d++) {
     c = (c << 5) - c + b.charCodeAt(d) | 0;
   }
-  return (a + c >>> 0) % S.length;
+  return (a + c >>> 0) % T.length;
 }
 function mb(a) {
   var b = lb(a.parent.id, a.name);
-  a.Oa = S[b];
-  S[b] = a;
+  a.Oa = T[b];
+  T[b] = a;
 }
 function cb(a, b) {
   var c;
   if (c = (c = nb(a, "x")) ? c : a.f.lookup ? 0 : 2) {
-    throw new O(c, a);
+    throw new Q(c, a);
   }
-  for (c = S[lb(a.id, b)]; c; c = c.Oa) {
+  for (c = T[lb(a.id, b)]; c; c = c.Oa) {
     var d = c.name;
     if (c.parent.id === a.id && d === b) {
       return c;
@@ -609,7 +612,7 @@ function cb(a, b) {
   return a.f.lookup(a, b);
 }
 function ab(a, b, c, d) {
-  U || (U = function(a, b, c, d) {
+  V || (V = function(a, b, c, d) {
     a || (a = this);
     this.parent = a;
     this.o = a.o;
@@ -620,7 +623,7 @@ function ab(a, b, c, d) {
     this.f = {};
     this.g = {};
     this.rdev = d;
-  }, U.prototype = {}, Object.defineProperties(U.prototype, {read:{get:function() {
+  }, V.prototype = {}, Object.defineProperties(V.prototype, {read:{get:function() {
     return 365 === (this.mode & 365);
   }, set:function(a) {
     a ? this.mode |= 365 : this.mode &= -366;
@@ -629,7 +632,7 @@ function ab(a, b, c, d) {
   }, set:function(a) {
     a ? this.mode |= 146 : this.mode &= -147;
   }}}));
-  a = new U(a, b, c, d);
+  a = new V(a, b, c, d);
   mb(a);
   return a;
 }
@@ -662,33 +665,33 @@ function qb(a, b) {
 function rb() {
   var a = 4096;
   for (var b = 0; b <= a; b++) {
-    if (!R[b]) {
+    if (!S[b]) {
       return b;
     }
   }
-  throw new O(33);
+  throw new Q(33);
 }
 function sb(a) {
-  V || (V = function() {
-  }, V.prototype = {}, Object.defineProperties(V.prototype, {object:{get:function() {
+  W || (W = function() {
+  }, W.prototype = {}, Object.defineProperties(W.prototype, {object:{get:function() {
     return this.node;
   }, set:function(a) {
     this.node = a;
   }}}));
-  var b = new V, c;
+  var b = new W, c;
   for (c in a) {
     b[c] = a[c];
   }
   a = b;
   b = rb();
   a.fd = b;
-  return R[b] = a;
+  return S[b] = a;
 }
 var $a = {open:function(a) {
   a.g = fb[a.node.rdev].g;
   a.g.open && a.g.open(a);
 }, v:function() {
-  throw new O(70);
+  throw new Q(70);
 }};
 function Va(a, b) {
   fb[a] = {g:b};
@@ -696,17 +699,17 @@ function Va(a, b) {
 function tb(a, b) {
   var c = "/" === b, d = !b;
   if (c && eb) {
-    throw new O(10);
+    throw new Q(10);
   }
   if (!c && !d) {
-    var f = T(b, {ra:!1});
+    var f = U(b, {ra:!1});
     b = f.path;
     f = f.node;
     if (f.S) {
-      throw new O(10);
+      throw new Q(10);
     }
     if (16384 !== (f.mode & 61440)) {
-      throw new O(54);
+      throw new Q(54);
     }
   }
   b = {type:a, ub:{}, wa:b, Na:[]};
@@ -716,21 +719,21 @@ function tb(a, b) {
   c ? eb = a : f && (f.S = b, f.o && f.o.Na.push(b));
 }
 function ub(a, b, c) {
-  var d = T(a, {parent:!0}).node;
+  var d = U(a, {parent:!0}).node;
   a = Ra(a);
   if (!a || "." === a || ".." === a) {
-    throw new O(28);
+    throw new Q(28);
   }
   var f = qb(d, a);
   if (f) {
-    throw new O(f);
+    throw new Q(f);
   }
   if (!d.f.R) {
-    throw new O(63);
+    throw new Q(63);
   }
   return d.f.R(d, a, b, c);
 }
-function W(a) {
+function X(a) {
   ub(a, 16895, 0);
 }
 function vb(a, b, c) {
@@ -739,35 +742,35 @@ function vb(a, b, c) {
 }
 function wb(a, b) {
   if (!Sa(a)) {
-    throw new O(44);
+    throw new Q(44);
   }
-  var c = T(b, {parent:!0}).node;
+  var c = U(b, {parent:!0}).node;
   if (!c) {
-    throw new O(44);
+    throw new Q(44);
   }
   b = Ra(b);
   var d = qb(c, b);
   if (d) {
-    throw new O(d);
+    throw new Q(d);
   }
   if (!c.f.symlink) {
-    throw new O(63);
+    throw new Q(63);
   }
   c.f.symlink(c, b, a);
 }
 function jb(a) {
-  a = T(a).node;
+  a = U(a).node;
   if (!a) {
-    throw new O(44);
+    throw new Q(44);
   }
   if (!a.f.readlink) {
-    throw new O(28);
+    throw new Q(28);
   }
   return Sa(kb(a.parent), a.f.readlink(a));
 }
 function xb(a, b) {
   if ("" === a) {
-    throw new O(44);
+    throw new Q(44);
   }
   if ("string" === typeof b) {
     var c = ob[b];
@@ -782,7 +785,7 @@ function xb(a, b) {
   } else {
     a = Pa(a);
     try {
-      f = T(a, {qa:!(b & 131072)}).node;
+      f = U(a, {qa:!(b & 131072)}).node;
     } catch (k) {
     }
   }
@@ -790,37 +793,37 @@ function xb(a, b) {
   if (b & 64) {
     if (f) {
       if (b & 128) {
-        throw new O(20);
+        throw new Q(20);
       }
     } else {
       f = ub(a, d, 0), c = !0;
     }
   }
   if (!f) {
-    throw new O(44);
+    throw new Q(44);
   }
   8192 === (f.mode & 61440) && (b &= -513);
   if (b & 65536 && 16384 !== (f.mode & 61440)) {
-    throw new O(54);
+    throw new Q(54);
   }
   if (!c && (d = f ? 40960 === (f.mode & 61440) ? 32 : 16384 === (f.mode & 61440) && ("r" !== pb(b) || b & 512) ? 31 : nb(f, pb(b)) : 44)) {
-    throw new O(d);
+    throw new Q(d);
   }
   if (b & 512) {
     d = f;
     var h;
-    "string" === typeof d ? h = T(d, {qa:!0}).node : h = d;
+    "string" === typeof d ? h = U(d, {qa:!0}).node : h = d;
     if (!h.f.l) {
-      throw new O(63);
+      throw new Q(63);
     }
     if (16384 === (h.mode & 61440)) {
-      throw new O(31);
+      throw new Q(31);
     }
     if (32768 !== (h.mode & 61440)) {
-      throw new O(28);
+      throw new Q(28);
     }
     if (d = nb(h, "w")) {
-      throw new O(d);
+      throw new Q(d);
     }
     h.f.l(h, {size:0, timestamp:Date.now()});
   }
@@ -836,27 +839,27 @@ function xb(a, b) {
 }
 function zb(a, b, c) {
   if (null === a.fd) {
-    throw new O(8);
+    throw new Q(8);
   }
   if (!a.seekable || !a.g.v) {
-    throw new O(70);
+    throw new Q(70);
   }
   if (0 != c && 1 != c && 2 != c) {
-    throw new O(28);
+    throw new Q(28);
   }
   a.position = a.g.v(a, b, c);
   a.bb = [];
 }
 function Ab() {
-  O || (O = function(a, b) {
+  Q || (Q = function(a, b) {
     this.node = b;
     this.Ua = function(a) {
       this.I = a;
     };
     this.Ua(a);
     this.message = "FS error";
-  }, O.prototype = Error(), O.prototype.constructor = O, [44].forEach(function(a) {
-    bb[a] = new O(a);
+  }, Q.prototype = Error(), Q.prototype.constructor = Q, [44].forEach(function(a) {
+    bb[a] = new Q(a);
     bb[a].stack = "<generic error, no stack>";
   }));
 }
@@ -867,7 +870,7 @@ function Cb(a, b) {
   b && (c |= 146);
   return c;
 }
-function X(a, b, c) {
+function Y(a, b, c) {
   a = Pa("/dev/" + a);
   var d = Cb(!!b, !!c);
   Db || (Db = 64);
@@ -881,10 +884,10 @@ function X(a, b, c) {
       try {
         var m = b();
       } catch (z) {
-        throw new O(29);
+        throw new Q(29);
       }
       if (void 0 === m && 0 === h) {
-        throw new O(6);
+        throw new Q(6);
       }
       if (null === m || void 0 === m) {
         break;
@@ -899,7 +902,7 @@ function X(a, b, c) {
       try {
         c(b[d + h]);
       } catch (r) {
-        throw new O(29);
+        throw new Q(29);
       }
     }
     f && (a.node.timestamp = Date.now());
@@ -907,20 +910,20 @@ function X(a, b, c) {
   }});
   vb(a, d, f);
 }
-var Db, Y = {}, U, V, yb, Eb = {}, Fb = 0;
-function Gb() {
-  Fb += 4;
-  return J[Fb - 4 >> 2];
+var Db, Eb = {}, V, W, yb, Fb = {}, Gb = 0;
+function Hb() {
+  Gb += 4;
+  return K[Gb - 4 >> 2];
 }
-function Hb(a) {
-  void 0 === a && (a = Gb());
-  a = R[a];
+function Ib(a) {
+  void 0 === a && (a = Hb());
+  a = S[a];
   if (!a) {
-    throw new O(8);
+    throw new Q(8);
   }
   return a;
 }
-function Ib(a, b) {
+function Jb(a, b) {
   e.b.Z = a;
   e.b.$ = b;
   if (e.b.m) {
@@ -960,7 +963,7 @@ function Ib(a, b) {
 function Z() {
   y();
 }
-function Jb(a) {
+function Kb(a) {
   var b = e.b.s;
   assert(!e.b.m, "emscripten_set_main_loop: there can only be one main loop function at once: call emscripten_cancel_main_loop to cancel the previous one before setting a new one with different parameters.");
   e.b.m = a;
@@ -972,7 +975,7 @@ function Jb(a) {
   };
   var d = e.b.B;
   e.b.Y = function() {
-    if (!D) {
+    if (!F) {
       if (0 < e.b.Aa.length) {
         var a = Date.now(), b = e.b.Aa.shift();
         b.m(b.s);
@@ -996,8 +999,8 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
   e.b.B++;
   var a = e.b.Z, b = e.b.$, c = e.b.m;
   e.b.m = null;
-  Jb(c);
-  Ib(a, b);
+  Kb(c);
+  Jb(a, b);
   e.b.A();
 }, cb:function() {
   if (g.setStatus) {
@@ -1005,7 +1008,7 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
     b ? b < c ? g.setStatus(a + " (" + (c - b) + "/" + c + ")") : g.setStatus(a) : g.setStatus("");
   }
 }, Ra:function(a) {
-  if (!(D || g.preMainLoop && !1 === g.preMainLoop())) {
+  if (!(F || g.preMainLoop && !1 === g.preMainLoop())) {
     try {
       a();
     } catch (b) {
@@ -1035,8 +1038,8 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
       if (e.O) {
         try {
           c = new Blob([a], {type:e.ga(b)}), c.size !== a.length && (c = new Blob([(new Uint8Array(a)).buffer], {type:e.ga(b)}));
-        } catch (p) {
-          ka("Blob constructor present but fails: " + p + "; falling back to blob builder");
+        } catch (q) {
+          ka("Blob constructor present but fails: " + q + "; falling back to blob builder");
         }
       }
       c || (c = new e.BlobBuilder, c.append((new Uint8Array(a)).buffer), c = c.getBlob());
@@ -1069,11 +1072,11 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
       var t = !1;
       if (e.O) {
         try {
-          var p = new Blob([a], {type:e.ga(b)});
-        } catch (E) {
+          var q = new Blob([a], {type:e.ga(b)});
+        } catch (D) {
           return d();
         }
-        p = e.N.createObjectURL(p);
+        q = e.N.createObjectURL(q);
         var r = new Audio;
         r.addEventListener("canplaythrough", function() {
           c(r);
@@ -1093,7 +1096,7 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
             c(r);
           }
         };
-        r.src = p;
+        r.src = q;
         e.Sa(function() {
           c(r);
         }, 10000);
@@ -1195,7 +1198,7 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
   }
 }, yb:function(a) {
   return function() {
-    if (!D) {
+    if (!F) {
       return a.apply(null, arguments);
     }
   };
@@ -1212,15 +1215,15 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
   }
 }, zb:function(a) {
   return e.requestAnimationFrame(function() {
-    D || (e.H ? a() : e.K.push(a));
+    F || (e.H ? a() : e.K.push(a));
   });
 }, Sa:function(a, b) {
   return setTimeout(function() {
-    D || (e.H ? a() : e.K.push(a));
+    F || (e.H ? a() : e.K.push(a));
   }, b);
 }, Ab:function(a, b) {
   return setInterval(function() {
-    D || e.H && a();
+    F || e.H && a();
   }, b);
 }, ga:function(a) {
   return {jpg:"image/jpeg", jpeg:"image/jpeg", png:"image/png", bmp:"image/bmp", ogg:"audio/ogg", wav:"audio/wav", mp3:"audio/mpeg"}[a.substr(a.lastIndexOf(".") + 1)];
@@ -1321,34 +1324,34 @@ e = {b:{A:null, method:"", B:0, m:null, s:0, Z:0, $:0, fa:0, Aa:[], pause:functi
   e.ya++;
   return a;
 }};
-var Kb = {};
-function Lb() {
-  if (!Mb) {
-    var a = {USER:"web_user", LOGNAME:"web_user", PATH:"/", PWD:"/", HOME:"/home/web_user", LANG:("object" === typeof navigator && navigator.languages && navigator.languages[0] || "C").replace("-", "_") + ".UTF-8", _:ba}, b;
-    for (b in Kb) {
-      a[b] = Kb[b];
+var Lb = {};
+function Mb() {
+  if (!Nb) {
+    var a = {USER:"web_user", LOGNAME:"web_user", PATH:"/", PWD:"/", HOME:"/home/web_user", LANG:("object" === typeof navigator && navigator.languages && navigator.languages[0] || "C").replace("-", "_") + ".UTF-8", _:aa}, b;
+    for (b in Lb) {
+      a[b] = Lb[b];
     }
     var c = [];
     for (b in a) {
       c.push(b + "=" + a[b]);
     }
-    Mb = c;
+    Nb = c;
   }
-  return Mb;
+  return Nb;
 }
-var Mb;
-function Nb(a) {
+var Nb;
+function Ob(a) {
   return 0 === a % 4 && (0 !== a % 100 || 0 === a % 400);
 }
-function Ob(a, b) {
+function Pb(a, b) {
   for (var c = 0, d = 0; d <= b; c += a[d++]) {
   }
   return c;
 }
-var Pb = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Qb = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-function Rb(a, b) {
+var Qb = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31], Rb = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+function Sb(a, b) {
   for (a = new Date(a.getTime()); 0 < b;) {
-    var c = a.getMonth(), d = (Nb(a.getFullYear()) ? Pb : Qb)[c];
+    var c = a.getMonth(), d = (Ob(a.getFullYear()) ? Qb : Rb)[c];
     if (b > d - a.getDate()) {
       b -= d - a.getDate() + 1, a.setDate(1), 11 > c ? a.setMonth(c + 1) : (a.setMonth(0), a.setFullYear(a.getFullYear() + 1));
     } else {
@@ -1358,7 +1361,7 @@ function Rb(a, b) {
   }
   return a;
 }
-function Sb(a, b, c, d) {
+function Tb(a, b, c, d) {
   function f(a, b, c) {
     for (a = "number" === typeof a ? a.toString() : a || ""; a.length < b;) {
       a = c[0] + a;
@@ -1395,22 +1398,22 @@ function Sb(a, b, c, d) {
     }
   }
   function t(a) {
-    a = Rb(new Date(a.i + 1900, 0, 1), a.da);
+    a = Sb(new Date(a.i + 1900, 0, 1), a.da);
     var b = m(new Date(a.getFullYear() + 1, 0, 4));
     return 0 >= k(m(new Date(a.getFullYear(), 0, 4)), a) ? 0 >= k(b, a) ? a.getFullYear() + 1 : a.getFullYear() : a.getFullYear() - 1;
   }
-  var p = J[d + 40 >> 2];
-  d = {$a:J[d >> 2], Za:J[d + 4 >> 2], aa:J[d + 8 >> 2], L:J[d + 12 >> 2], G:J[d + 16 >> 2], i:J[d + 20 >> 2], ba:J[d + 24 >> 2], da:J[d + 28 >> 2], Bb:J[d + 32 >> 2], Ya:J[d + 36 >> 2], ab:p ? p ? G(I, p, void 0) : "" : ""};
-  c = c ? G(I, c, void 0) : "";
-  p = {"%c":"%a %b %d %H:%M:%S %Y", "%D":"%m/%d/%y", "%F":"%Y-%m-%d", "%h":"%b", "%r":"%I:%M:%S %p", "%R":"%H:%M", "%T":"%H:%M:%S", "%x":"%m/%d/%y", "%X":"%H:%M:%S", "%Ec":"%c", "%EC":"%C", "%Ex":"%m/%d/%y", "%EX":"%H:%M:%S", "%Ey":"%y", "%EY":"%Y", "%Od":"%d", "%Oe":"%e", "%OH":"%H", "%OI":"%I", "%Om":"%m", "%OM":"%M", "%OS":"%S", "%Ou":"%u", "%OU":"%U", "%OV":"%V", "%Ow":"%w", "%OW":"%W", "%Oy":"%y"};
-  for (var r in p) {
-    c = c.replace(new RegExp(r, "g"), p[r]);
+  var q = K[d + 40 >> 2];
+  d = {$a:K[d >> 2], Za:K[d + 4 >> 2], aa:K[d + 8 >> 2], L:K[d + 12 >> 2], G:K[d + 16 >> 2], i:K[d + 20 >> 2], ba:K[d + 24 >> 2], da:K[d + 28 >> 2], Bb:K[d + 32 >> 2], Ya:K[d + 36 >> 2], ab:q ? H(q) : ""};
+  c = H(c);
+  q = {"%c":"%a %b %d %H:%M:%S %Y", "%D":"%m/%d/%y", "%F":"%Y-%m-%d", "%h":"%b", "%r":"%I:%M:%S %p", "%R":"%H:%M", "%T":"%H:%M:%S", "%x":"%m/%d/%y", "%X":"%H:%M:%S", "%Ec":"%c", "%EC":"%C", "%Ex":"%m/%d/%y", "%EX":"%H:%M:%S", "%Ey":"%y", "%EY":"%Y", "%Od":"%d", "%Oe":"%e", "%OH":"%H", "%OI":"%I", "%Om":"%m", "%OM":"%M", "%OS":"%S", "%Ou":"%u", "%OU":"%U", "%OV":"%V", "%Ow":"%w", "%OW":"%W", "%Oy":"%y"};
+  for (var r in q) {
+    c = c.replace(new RegExp(r, "g"), q[r]);
   }
-  var E = "Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" "), z = "January February March April May June July August September October November December".split(" ");
-  p = {"%a":function(a) {
-    return E[a.ba].substring(0, 3);
+  var D = "Sunday Monday Tuesday Wednesday Thursday Friday Saturday".split(" "), z = "January February March April May June July August September October November December".split(" ");
+  q = {"%a":function(a) {
+    return D[a.ba].substring(0, 3);
   }, "%A":function(a) {
-    return E[a.ba];
+    return D[a.ba];
   }, "%b":function(a) {
     return z[a.G].substring(0, 3);
   }, "%B":function(a) {
@@ -1432,7 +1435,7 @@ function Sb(a, b, c, d) {
     0 == a ? a = 12 : 12 < a && (a -= 12);
     return h(a, 2);
   }, "%j":function(a) {
-    return h(a.L + Ob(Nb(a.i + 1900) ? Pb : Qb, a.G - 1), 3);
+    return h(a.L + Pb(Ob(a.i + 1900) ? Qb : Rb, a.G - 1), 3);
   }, "%m":function(a) {
     return h(a.G + 1, 2);
   }, "%M":function(a) {
@@ -1448,18 +1451,18 @@ function Sb(a, b, c, d) {
   }, "%u":function(a) {
     return a.ba || 7;
   }, "%U":function(a) {
-    var b = new Date(a.i + 1900, 0, 1), c = 0 === b.getDay() ? b : Rb(b, 7 - b.getDay());
+    var b = new Date(a.i + 1900, 0, 1), c = 0 === b.getDay() ? b : Sb(b, 7 - b.getDay());
     a = new Date(a.i + 1900, a.G, a.L);
-    return 0 > k(c, a) ? h(Math.ceil((31 - c.getDate() + (Ob(Nb(a.getFullYear()) ? Pb : Qb, a.getMonth() - 1) - 31) + a.getDate()) / 7), 2) : 0 === k(c, b) ? "01" : "00";
+    return 0 > k(c, a) ? h(Math.ceil((31 - c.getDate() + (Pb(Ob(a.getFullYear()) ? Qb : Rb, a.getMonth() - 1) - 31) + a.getDate()) / 7), 2) : 0 === k(c, b) ? "01" : "00";
   }, "%V":function(a) {
-    var b = m(new Date(a.i + 1900, 0, 4)), c = m(new Date(a.i + 1901, 0, 4)), d = Rb(new Date(a.i + 1900, 0, 1), a.da);
+    var b = m(new Date(a.i + 1900, 0, 4)), c = m(new Date(a.i + 1901, 0, 4)), d = Sb(new Date(a.i + 1900, 0, 1), a.da);
     return 0 > k(d, b) ? "53" : 0 >= k(c, d) ? "01" : h(Math.ceil((b.getFullYear() < a.i + 1900 ? a.da + 32 - b.getDate() : a.da + 1 - b.getDate()) / 7), 2);
   }, "%w":function(a) {
     return a.ba;
   }, "%W":function(a) {
-    var b = new Date(a.i, 0, 1), c = 1 === b.getDay() ? b : Rb(b, 0 === b.getDay() ? 1 : 7 - b.getDay() + 1);
+    var b = new Date(a.i, 0, 1), c = 1 === b.getDay() ? b : Sb(b, 0 === b.getDay() ? 1 : 7 - b.getDay() + 1);
     a = new Date(a.i + 1900, a.G, a.L);
-    return 0 > k(c, a) ? h(Math.ceil((31 - c.getDate() + (Ob(Nb(a.getFullYear()) ? Pb : Qb, a.getMonth() - 1) - 31) + a.getDate()) / 7), 2) : 0 === k(c, b) ? "01" : "00";
+    return 0 > k(c, a) ? h(Math.ceil((31 - c.getDate() + (Pb(Ob(a.getFullYear()) ? Qb : Rb, a.getMonth() - 1) - 31) + a.getDate()) / 7), 2) : 0 === k(c, b) ? "01" : "00";
   }, "%y":function(a) {
     return (a.i + 1900).toString().substring(2);
   }, "%Y":function(a) {
@@ -1474,24 +1477,24 @@ function Sb(a, b, c, d) {
   }, "%%":function() {
     return "%";
   }};
-  for (r in p) {
-    0 <= c.indexOf(r) && (c = c.replace(new RegExp(r, "g"), p[r](d)));
+  for (r in q) {
+    0 <= c.indexOf(r) && (c = c.replace(new RegExp(r, "g"), q[r](d)));
   }
   r = Xa(c, !1);
   if (r.length > b) {
     return 0;
   }
-  H.set(r, a);
+  J.set(r, a);
   return r.length - 1;
 }
 Ab();
-S = Array(4096);
-tb(Q, "/");
-W("/tmp");
-W("/home");
-W("/home/web_user");
+T = Array(4096);
+tb(R, "/");
+X("/tmp");
+X("/home");
+X("/home/web_user");
 (function() {
-  W("/dev");
+  X("/dev");
   Va(259, {read:function() {
     return 0;
   }, write:function(a, b, c, k) {
@@ -1522,20 +1525,20 @@ W("/home/web_user");
   b || (b = function() {
     y("random_device");
   });
-  X("random", b);
-  X("urandom", b);
-  W("/dev/shm");
-  W("/dev/shm/tmp");
+  Y("random", b);
+  Y("urandom", b);
+  X("/dev/shm");
+  X("/dev/shm/tmp");
 })();
-W("/proc");
-W("/proc/self");
-W("/proc/self/fd");
+X("/proc");
+X("/proc/self");
+X("/proc/self/fd");
 tb({o:function() {
   var a = ab("/proc/self", "fd", 16895, 73);
   a.f = {lookup:function(a, c) {
-    var b = R[+c];
+    var b = S[+c];
     if (!b) {
-      throw new O(8);
+      throw new Q(8);
     }
     a = {parent:null, o:{wa:"fake"}, f:{readlink:function() {
       return b.path;
@@ -1631,44 +1634,46 @@ function Xa(a, b) {
   b && (c.length = a);
   return c;
 }
-var Wb = {__cxa_atexit:function() {
+var Xb = {__assert_fail:function(a, b, c, d) {
+  y("Assertion failed: " + H(a) + ", at: " + [b ? H(b) : "unknown filename", c, d ? H(d) : "unknown function"]);
+}, __cxa_atexit:function() {
   return Na.apply(null, arguments);
 }, __lock:function() {
 }, __map_file:function() {
-  g.___errno_location && (J[g.___errno_location() >> 2] = 63);
+  g.___errno_location && (K[g.___errno_location() >> 2] = 63);
   return -1;
 }, __syscall91:function(a, b) {
-  Fb = b;
+  Gb = b;
   try {
-    var c = Gb(), d = Gb();
+    var c = Hb(), d = Hb();
     if (-1 === c || 0 === d) {
       var f = -28;
     } else {
-      var h = Eb[c];
+      var h = Fb[c];
       if (h && d === h.pb) {
-        var k = R[h.fd], m = h.flags, t = new Uint8Array(I.subarray(c, c + d));
+        var k = S[h.fd], m = h.flags, t = new Uint8Array(I.subarray(c, c + d));
         k && k.g.X && k.g.X(k, t, 0, d, m);
-        Eb[c] = null;
-        h.Da && Tb(h.sb);
+        Fb[c] = null;
+        h.Da && Ub(h.sb);
       }
       f = 0;
     }
     return f;
-  } catch (p) {
-    return "undefined" !== typeof Y && p instanceof O || y(p), -p.I;
+  } catch (q) {
+    return "undefined" !== typeof Eb && q instanceof Q || y(q), -q.I;
   }
 }, __unlock:function() {
 }, abort:function() {
   y();
 }, emscripten_get_sbrk_ptr:function() {
-  return 23408;
+  return 31440;
 }, emscripten_memcpy_big:function(a, b, c) {
   I.set(I.subarray(b, b + c), a);
 }, emscripten_resize_heap:function(a) {
   if (2147418112 < a) {
     return !1;
   }
-  for (var b = Math.max(H.length, 16777216); b < a;) {
+  for (var b = Math.max(J.length, 16777216); b < a;) {
     536870912 >= b ? b = oa(2 * b) : b = Math.min(oa((3 * b + 2147483648) / 4), 2147418112);
   }
   a: {
@@ -1683,38 +1688,38 @@ var Wb = {__cxa_atexit:function() {
   }
   return c ? !0 : !1;
 }, emscripten_worker_respond:function(a, b) {
-  if (Ub) {
+  if (Vb) {
     throw "already responded with final response!";
   }
-  Ub = !0;
-  b = {callbackId:Vb, finalResponse:!0, data:a ? new Uint8Array(I.subarray(a, a + b)) : 0};
+  Vb = !0;
+  b = {callbackId:Wb, finalResponse:!0, data:a ? new Uint8Array(I.subarray(a, a + b)) : 0};
   a ? postMessage(b, [b.data.buffer]) : postMessage(b);
 }, environ_get:function(a, b) {
   var c = 0;
-  Lb().forEach(function(d, f) {
+  Mb().forEach(function(d, f) {
     var h = b + c;
-    f = J[a + 4 * f >> 2] = h;
+    f = K[a + 4 * f >> 2] = h;
     for (h = 0; h < d.length; ++h) {
-      H[f++ >> 0] = d.charCodeAt(h);
+      J[f++ >> 0] = d.charCodeAt(h);
     }
-    H[f >> 0] = 0;
+    J[f >> 0] = 0;
     c += d.length + 1;
   });
   return 0;
 }, environ_sizes_get:function(a, b) {
-  var c = Lb();
-  J[a >> 2] = c.length;
+  var c = Mb();
+  K[a >> 2] = c.length;
   var d = 0;
   c.forEach(function(a) {
     d += a.length + 1;
   });
-  J[b >> 2] = d;
+  K[b >> 2] = d;
   return 0;
 }, fd_close:function(a) {
   try {
-    var b = Hb(a);
+    var b = Ib(a);
     if (null === b.fd) {
-      throw new O(8);
+      throw new Q(8);
     }
     b.ha && (b.ha = null);
     try {
@@ -1722,132 +1727,132 @@ var Wb = {__cxa_atexit:function() {
     } catch (c) {
       throw c;
     } finally {
-      R[b.fd] = null;
+      S[b.fd] = null;
     }
     b.fd = null;
     return 0;
   } catch (c) {
-    return "undefined" !== typeof Y && c instanceof O || y(c), c.I;
+    return "undefined" !== typeof Eb && c instanceof Q || y(c), c.I;
   }
 }, fd_read:function(a, b, c, d) {
   try {
     a: {
-      for (var f = Hb(a), h = a = 0; h < c; h++) {
-        var k = J[b + (8 * h + 4) >> 2], m = f, t = J[b + 8 * h >> 2], p = k, r = void 0, E = H;
-        if (0 > p || 0 > r) {
-          throw new O(28);
+      for (var f = Ib(a), h = a = 0; h < c; h++) {
+        var k = K[b + (8 * h + 4) >> 2], m = f, t = K[b + 8 * h >> 2], q = k, r = void 0, D = J;
+        if (0 > q || 0 > r) {
+          throw new Q(28);
         }
         if (null === m.fd) {
-          throw new O(8);
+          throw new Q(8);
         }
         if (1 === (m.flags & 2097155)) {
-          throw new O(8);
+          throw new Q(8);
         }
         if (16384 === (m.node.mode & 61440)) {
-          throw new O(31);
+          throw new Q(31);
         }
         if (!m.g.read) {
-          throw new O(28);
+          throw new Q(28);
         }
         var z = "undefined" !== typeof r;
         if (!z) {
           r = m.position;
         } else {
           if (!m.seekable) {
-            throw new O(70);
+            throw new Q(70);
           }
         }
-        var aa = m.g.read(m, E, t, p, r);
-        z || (m.position += aa);
-        var P = aa;
-        if (0 > P) {
-          var F = -1;
+        var ba = m.g.read(m, D, t, q, r);
+        z || (m.position += ba);
+        var O = ba;
+        if (0 > O) {
+          var E = -1;
           break a;
         }
-        a += P;
-        if (P < k) {
+        a += O;
+        if (O < k) {
           break;
         }
       }
-      F = a;
+      E = a;
     }
-    J[d >> 2] = F;
+    K[d >> 2] = E;
     return 0;
-  } catch (La) {
-    return "undefined" !== typeof Y && La instanceof O || y(La), La.I;
+  } catch (Ma) {
+    return "undefined" !== typeof Eb && Ma instanceof Q || y(Ma), Ma.I;
   }
 }, fd_seek:function(a, b, c, d, f) {
   try {
-    var h = Hb(a);
+    var h = Ib(a);
     a = 4294967296 * c + (b >>> 0);
     if (-9007199254740992 >= a || 9007199254740992 <= a) {
       return -61;
     }
     zb(h, a, d);
-    Ka = [h.position >>> 0, (N = h.position, 1.0 <= +za(N) ? 0.0 < N ? (Ca(+Ba(N / 4294967296.0), 4294967295.0) | 0) >>> 0 : ~~+Aa((N - +(~~N >>> 0)) / 4294967296.0) >>> 0 : 0)];
-    J[f >> 2] = Ka[0];
-    J[f + 4 >> 2] = Ka[1];
+    Ka = [h.position >>> 0, (P = h.position, 1.0 <= +za(P) ? 0.0 < P ? (Ca(+Ba(P / 4294967296.0), 4294967295.0) | 0) >>> 0 : ~~+Aa((P - +(~~P >>> 0)) / 4294967296.0) >>> 0 : 0)];
+    K[f >> 2] = Ka[0];
+    K[f + 4 >> 2] = Ka[1];
     h.ha && 0 === a && 0 === d && (h.ha = null);
     return 0;
   } catch (k) {
-    return "undefined" !== typeof Y && k instanceof O || y(k), k.I;
+    return "undefined" !== typeof Eb && k instanceof Q || y(k), k.I;
   }
 }, fd_write:function(a, b, c, d) {
   try {
     a: {
-      for (var f = Hb(a), h = a = 0; h < c; h++) {
-        var k = f, m = J[b + 8 * h >> 2], t = J[b + (8 * h + 4) >> 2], p = void 0, r = H;
-        if (0 > t || 0 > p) {
-          throw new O(28);
+      for (var f = Ib(a), h = a = 0; h < c; h++) {
+        var k = f, m = K[b + 8 * h >> 2], t = K[b + (8 * h + 4) >> 2], q = void 0, r = J;
+        if (0 > t || 0 > q) {
+          throw new Q(28);
         }
         if (null === k.fd) {
-          throw new O(8);
+          throw new Q(8);
         }
         if (0 === (k.flags & 2097155)) {
-          throw new O(8);
+          throw new Q(8);
         }
         if (16384 === (k.node.mode & 61440)) {
-          throw new O(31);
+          throw new Q(31);
         }
         if (!k.g.write) {
-          throw new O(28);
+          throw new Q(28);
         }
         k.flags & 1024 && zb(k, 0, 2);
-        var E = "undefined" !== typeof p;
-        if (!E) {
-          p = k.position;
+        var D = "undefined" !== typeof q;
+        if (!D) {
+          q = k.position;
         } else {
           if (!k.seekable) {
-            throw new O(70);
+            throw new Q(70);
           }
         }
-        var z = k.g.write(k, r, m, t, p, void 0);
-        E || (k.position += z);
+        var z = k.g.write(k, r, m, t, q, void 0);
+        D || (k.position += z);
         try {
           if (k.path && ib.onWriteToFile) {
             ib.onWriteToFile(k.path);
           }
-        } catch (F) {
-          console.log("FS.trackingDelegate['onWriteToFile']('" + k.path + "') threw an exception: " + F.message);
+        } catch (E) {
+          console.log("FS.trackingDelegate['onWriteToFile']('" + k.path + "') threw an exception: " + E.message);
         }
-        var aa = z;
-        if (0 > aa) {
-          var P = -1;
+        var ba = z;
+        if (0 > ba) {
+          var O = -1;
           break a;
         }
-        a += aa;
+        a += ba;
       }
-      P = a;
+      O = a;
     }
-    J[d >> 2] = P;
+    K[d >> 2] = O;
     return 0;
-  } catch (F) {
-    return "undefined" !== typeof Y && F instanceof O || y(F), F.I;
+  } catch (E) {
+    return "undefined" !== typeof Eb && E instanceof Q || y(E), E.I;
   }
 }, memory:C, setTempRet0:function() {
 }, strftime_l:function(a, b, c, d) {
-  return Sb(a, b, c, d);
-}, table:ma}, Xb = function() {
+  return Tb(a, b, c, d);
+}, table:ma}, Yb = function() {
   function a(a) {
     g.asm = a.exports;
     Fa();
@@ -1863,7 +1868,7 @@ var Wb = {__cxa_atexit:function() {
       y(a);
     });
   }
-  var d = {env:Wb, wasi_unstable:Wb};
+  var d = {env:Xb, wasi_unstable:Xb};
   Ea();
   if (g.instantiateWasm) {
     try {
@@ -1876,7 +1881,7 @@ var Wb = {__cxa_atexit:function() {
     if (B || "function" !== typeof WebAssembly.instantiateStreaming || Ga() || "function" !== typeof fetch) {
       return c(b);
     }
-    fetch(M, {credentials:"same-origin"}).then(function(a) {
+    fetch(N, {credentials:"same-origin"}).then(function(a) {
       return WebAssembly.instantiateStreaming(a, d).then(b, function(a) {
         A("wasm streaming compile failed: " + a);
         A("falling back to ArrayBuffer instantiation");
@@ -1886,8 +1891,8 @@ var Wb = {__cxa_atexit:function() {
   })();
   return {};
 }();
-g.asm = Xb;
-var Ma = g.___wasm_call_ctors = function() {
+g.asm = Yb;
+var La = g.___wasm_call_ctors = function() {
   return g.asm.__wasm_call_ctors.apply(null, arguments);
 };
 g._loadMesh = function() {
@@ -1923,7 +1928,7 @@ g._UmbraExternalMeshStreamNext = function() {
 g.___errno_location = function() {
   return g.asm.__errno_location.apply(null, arguments);
 };
-var Tb = g._free = function() {
+var Ub = g._free = function() {
   return g.asm.free.apply(null, arguments);
 }, db = g._malloc = function() {
   return g.asm.malloc.apply(null, arguments);
@@ -1952,26 +1957,26 @@ g.stackRestore = function() {
 g.__growWasmMemory = function() {
   return g.asm.__growWasmMemory.apply(null, arguments);
 };
+g.dynCall_iiii = function() {
+  return g.asm.dynCall_iiii.apply(null, arguments);
+};
+g.dynCall_ii = function() {
+  return g.asm.dynCall_ii.apply(null, arguments);
+};
 g.dynCall_vi = function() {
   return g.asm.dynCall_vi.apply(null, arguments);
 };
 g.dynCall_vii = function() {
   return g.asm.dynCall_vii.apply(null, arguments);
 };
-g.dynCall_iiii = function() {
-  return g.asm.dynCall_iiii.apply(null, arguments);
-};
-g.dynCall_iidiiii = function() {
-  return g.asm.dynCall_iidiiii.apply(null, arguments);
-};
-g.dynCall_ii = function() {
-  return g.asm.dynCall_ii.apply(null, arguments);
-};
 g.dynCall_iiiii = function() {
   return g.asm.dynCall_iiiii.apply(null, arguments);
 };
 g.dynCall_iii = function() {
   return g.asm.dynCall_iii.apply(null, arguments);
+};
+g.dynCall_iidiiii = function() {
+  return g.asm.dynCall_iidiiii.apply(null, arguments);
 };
 g.dynCall_jiji = function() {
   return g.asm.dynCall_jiji.apply(null, arguments);
@@ -2015,17 +2020,17 @@ g.dynCall_iiiiijj = function() {
 g.dynCall_v = function() {
   return g.asm.dynCall_v.apply(null, arguments);
 };
-g.asm = Xb;
-var Yb;
-L = function Zb() {
-  Yb || $b();
-  Yb || (L = Zb);
+g.asm = Yb;
+var Zb;
+M = function $b() {
+  Zb || ac();
+  Zb || (M = $b);
 };
-function $b() {
+function ac() {
   function a() {
-    if (!Yb && (Yb = !0, !D)) {
+    if (!Zb && (Zb = !0, !F)) {
       xa = !0;
-      g.noFSInit || Bb || (Bb = !0, Ab(), g.stdin = g.stdin, g.stdout = g.stdout, g.stderr = g.stderr, g.stdin ? X("stdin", g.stdin) : wb("/dev/tty", "/dev/stdin"), g.stdout ? X("stdout", null, g.stdout) : wb("/dev/tty", "/dev/stdout"), g.stderr ? X("stderr", null, g.stderr) : wb("/dev/tty1", "/dev/stderr"), xb("/dev/stdin", "r"), xb("/dev/stdout", "w"), xb("/dev/stderr", "w"));
+      g.noFSInit || Bb || (Bb = !0, Ab(), g.stdin = g.stdin, g.stdout = g.stdout, g.stderr = g.stderr, g.stdin ? Y("stdin", g.stdin) : wb("/dev/tty", "/dev/stdin"), g.stdout ? Y("stdout", null, g.stdout) : wb("/dev/tty", "/dev/stdout"), g.stderr ? Y("stderr", null, g.stderr) : wb("/dev/tty1", "/dev/stderr"), xb("/dev/stdin", "r"), xb("/dev/stdout", "w"), xb("/dev/stderr", "w"));
       ra(ta);
       hb = !1;
       ra(ua);
@@ -2041,14 +2046,14 @@ function $b() {
       ra(wa);
     }
   }
-  if (!(0 < K)) {
+  if (!(0 < L)) {
     if (g.preRun) {
       for ("function" == typeof g.preRun && (g.preRun = [g.preRun]); g.preRun.length;) {
         ya();
       }
     }
     ra(sa);
-    0 < K || (g.setStatus ? (g.setStatus("Running..."), setTimeout(function() {
+    0 < L || (g.setStatus ? (g.setStatus("Running..."), setTimeout(function() {
       setTimeout(function() {
         g.setStatus("");
       }, 1);
@@ -2056,14 +2061,14 @@ function $b() {
     }, 1)) : a());
   }
 }
-g.run = $b;
+g.run = ac;
 if (g.preInit) {
   for ("function" == typeof g.preInit && (g.preInit = [g.preInit]); 0 < g.preInit.length;) {
     g.preInit.pop()();
   }
 }
-$b();
-var Ub = !1, Vb = -1;
+ac();
+var Vb = !1, Wb = -1;
 (function() {
   function a() {
     if (c && xa) {
@@ -2090,12 +2095,12 @@ var Ub = !1, Vb = -1;
       if (m) {
         m.byteLength || (m = new Uint8Array(m));
         if (!d || f < m.length) {
-          d && Tb(d), f = m.length, d = db(m.length);
+          d && Ub(d), f = m.length, d = db(m.length);
         }
         I.set(m, d);
       }
-      Ub = !1;
-      Vb = h.data.callbackId;
+      Vb = !1;
+      Wb = h.data.callbackId;
       m ? k(d, m.length) : k(0, 0);
     } else {
       c || (c = [], setTimeout(b, 100)), c.push(h);
