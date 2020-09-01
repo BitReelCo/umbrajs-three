@@ -117,21 +117,6 @@ function _typeof$1(obj) {
   return _typeof$1(obj);
 }
 
-function _defineProperty$1(obj, key, value) {
-  if (key in obj) {
-    Object.defineProperty(obj, key, {
-      value: value,
-      enumerable: true,
-      configurable: true,
-      writable: true
-    });
-  } else {
-    obj[key] = value;
-  }
-
-  return obj;
-}
-
 function _toConsumableArray$1(arr) {
   return _arrayWithoutHoles$1(arr) || _iterableToArray$1(arr) || _nonIterableSpread$1();
 }
@@ -353,7 +338,7 @@ var UmbraNativeAPI = function () {
     w && (D = w.buffer);
     va = D.byteLength;
     ua();
-    E[4356] = 5260336;
+    E[4380] = 5260432;
 
     function wa(a) {
       for (; 0 < a.length;) {
@@ -1297,7 +1282,7 @@ var UmbraNativeAPI = function () {
     }
 
     c._exit = qc;
-    ka("GMT", 17328, 4);
+    ka("GMT", 17424, 4);
 
     function rc(a) {
       a = pa(a);
@@ -1984,18 +1969,18 @@ var UmbraNativeAPI = function () {
       R: qc,
       Q: function Q(a) {
         a = new Date(1E3 * E[a >> 2]);
-        E[4320] = a.getUTCSeconds();
-        E[4321] = a.getUTCMinutes();
-        E[4322] = a.getUTCHours();
-        E[4323] = a.getUTCDate();
-        E[4324] = a.getUTCMonth();
-        E[4325] = a.getUTCFullYear() - 1900;
-        E[4326] = a.getUTCDay();
-        E[4329] = 0;
-        E[4328] = 0;
-        E[4327] = (a.getTime() - Date.UTC(a.getUTCFullYear(), 0, 1, 0, 0, 0, 0)) / 864E5 | 0;
-        E[4330] = 17328;
-        return 17280;
+        E[4344] = a.getUTCSeconds();
+        E[4345] = a.getUTCMinutes();
+        E[4346] = a.getUTCHours();
+        E[4347] = a.getUTCDate();
+        E[4348] = a.getUTCMonth();
+        E[4349] = a.getUTCFullYear() - 1900;
+        E[4350] = a.getUTCDay();
+        E[4353] = 0;
+        E[4352] = 0;
+        E[4351] = (a.getTime() - Date.UTC(a.getUTCFullYear(), 0, 1, 0, 0, 0, 0)) / 864E5 | 0;
+        E[4354] = 17424;
+        return 17376;
       },
       P: function P() {
         z("trap!");
@@ -2008,8 +1993,8 @@ var UmbraNativeAPI = function () {
       N: function N() {
         z("OOM");
       },
-      a: 17424,
-      b: 17264
+      a: 17520,
+      b: 17360
     }, D);
     c.asm = xc;
 
@@ -2489,7 +2474,7 @@ var UmbraNativeAPI = function () {
   };
 }();
 
-// Generated at 2020-07-06 15:28:19
+// Generated at 2020-08-18 15:23:39
 var MatrixFormat;
 
 (function (MatrixFormat) {
@@ -2557,7 +2542,9 @@ var TextureFormat;
   TextureFormat[TextureFormat["RGBA_FLOAT16"] = 43] = "RGBA_FLOAT16";
   TextureFormat[TextureFormat["RGB_FLOAT16"] = 44] = "RGB_FLOAT16";
   TextureFormat[TextureFormat["RGB_FLOAT32"] = 45] = "RGB_FLOAT32";
-  TextureFormat[TextureFormat["Count"] = 46] = "Count";
+  TextureFormat[TextureFormat["BC6H"] = 46] = "BC6H";
+  TextureFormat[TextureFormat["BC7"] = 47] = "BC7";
+  TextureFormat[TextureFormat["Count"] = 48] = "Count";
 })(TextureFormat || (TextureFormat = {}));
 
 var ColorSpace;
@@ -2694,7 +2681,8 @@ var FilterShapeType;
 (function (FilterShapeType) {
   FilterShapeType[FilterShapeType["Sphere"] = 0] = "Sphere";
   FilterShapeType[FilterShapeType["Cylinder"] = 1] = "Cylinder";
-  FilterShapeType[FilterShapeType["Count"] = 2] = "Count";
+  FilterShapeType[FilterShapeType["None"] = 2] = "None";
+  FilterShapeType[FilterShapeType["Count"] = 3] = "Count";
 })(FilterShapeType || (FilterShapeType = {}));
 
 var SceneCopyStatus;
@@ -2757,7 +2745,10 @@ var Assets = /*#__PURE__*/Object.freeze({
 });
 
 var MAX_LIGHTS = 32;
-var arrayToHeap = new Map([[Float32Array, 'HEAPF32'], [Uint32Array, 'HEAPU32'], [Uint16Array, 'HEAPU16'], [Uint8Array, 'HEAPU8']]);
+var arrayNameToHeapName = new Map([['Int8Array', 'HEAP8'], ['Int16Array', 'HEAP16'], ['Int32Array', 'HEAP32'], ['Uint8Array', 'HEAPU8'], ['Uint16Array', 'HEAPU16'], ['Uint32Array', 'HEAPU32'], ['Float32Array', 'HEAPF32'], ['Float64Array', 'HEAPF64']]); // gl.texImage2D expects these texture "type" and TypedArrayView combinations.
+// See https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/texImage2D
+
+var textureFormatToArrayType = new Map([[TextureFormat.RGB565, Uint16Array], [TextureFormat.RGBA32, Uint8Array], [TextureFormat.RG8, Uint8Array], [TextureFormat.RG16F, Uint16Array], [TextureFormat.RGB_FLOAT32, Float32Array], [TextureFormat.RGB24, Uint8Array], [TextureFormat.UINT32, Uint32Array]]);
 
 function assertInteger(x) {
   if (!Number.isInteger(x)) {
@@ -2852,7 +2843,13 @@ var create = function create(Module) {
       this.start = start;
       this.size = size;
       this.type = type;
-      this.heapName = arrayToHeap.get(type);
+
+      if (!arrayNameToHeapName.has(type.name)) {
+        console.error('BufferView got type', type);
+        throw new TypeError("BufferView constructor got invalid type '".concat(type.name, "'"));
+      } else {
+        this.heapName = arrayNameToHeapName.get(type.name);
+      }
     }
 
     getArray() {
@@ -3410,12 +3407,17 @@ var create = function create(Module) {
           var bufferView = new BufferView(buffer, 0, texture.dataByteSize);
 
           if (this.formatNeedsTranscoding(texture.format)) {
-            var _formatToArrayType;
-
             texture = this.downsampleAndTranscodeTexture(texture, buffer, this.tempTranscodedBuffer);
-            var formatToArrayType = (_formatToArrayType = {}, _defineProperty$1(_formatToArrayType, TextureFormat.RGBA32, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RGB565, Uint16Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG8, Uint8Array), _defineProperty$1(_formatToArrayType, TextureFormat.RG16F, Uint16Array), _formatToArrayType);
-            bufferView = new BufferView(this.tempTranscodedBuffer, 0, texture.dataByteSize);
-            bufferView.type = formatToArrayType[texture.format];
+            bufferView = new BufferView(this.tempTranscodedBuffer, 0, texture.dataByteSize); // After transcoding, we must pick the correct ArrayBufferView constructor because
+            // gl.texImage2D's data argument type must match the "type" argument.
+
+            if (textureFormatToArrayType.has(texture.format)) {
+              bufferView.type = textureFormatToArrayType.get(texture.format);
+            } else {
+              console.error('Transcoding returned an unexpected texture format:', texture.format);
+              load.finish(AssetLoadResult.Failure);
+              yield undefined;
+            }
           } // Convert internal enums to string constants
           // info.format = Native.TextureFormat[info.format]
           // info.colorSpace = Native.ColorSpace[info.colorSpace]
@@ -3599,7 +3601,7 @@ var create = function create(Module) {
   };
 };
 
-// Generated at 2020-07-06 15:28:19
+// Generated at 2020-08-18 15:23:39
 function wrapNativeFunctions(Module) {
   Object.assign(Module, {
     configInit: Module.cwrap('UmbraConfigInit', null, ['number']),
