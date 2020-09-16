@@ -25,8 +25,8 @@ const commonPlugins = () => [
   babel({ extensions, include: ['src/**/*'], babelHelpers: 'bundled' }),
   copyfiles([
     ['node_modules/@umbra3d/umbrajs/dist/umbra.wasm', 'dist/umbra.wasm'],
-    ['node_modules/@umbra3d/umbrajs/dist/UmbraPlayerWorker.wasm', 'dist/UmbraPlayerWorker.wasm'],
-    ['node_modules/@umbra3d/umbrajs/dist/UmbraPlayerWorker.js', 'dist/UmbraPlayerWorker.js'],
+    ['node_modules/@umbra3d/umbrajs/dist/UmbraAssetWorker.wasm', 'dist/UmbraAssetWorker.wasm'],
+    ['node_modules/@umbra3d/umbrajs/dist/UmbraAssetWorker.js', 'dist/UmbraAssetWorker.js'],
   ]),
 ]
 
