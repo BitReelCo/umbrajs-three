@@ -36,7 +36,7 @@ export declare class UmbraScene extends THREE.Object3D {
     readonly isLOD = true;
     readonly autoUpdate = true;
     readonly name = "UmbraScene";
-    quality: number;
+    set quality(value: number);
     private renderer;
     private materialPool;
     private shaderPatcher;
@@ -47,7 +47,8 @@ export declare class UmbraScene extends THREE.Object3D {
     private onDispose;
     private oldState;
     constructor(runtime: Runtime, scene: NativeScene, sharedState: SharedFrameState, renderer: THREE.WebGLRenderer, features: PlatformFeatures, onDispose?: DisposeCallback);
-    opaqueMaterial: THREE.Material;
+    get opaqueMaterial(): THREE.Material;
+    set opaqueMaterial(mat: THREE.Material);
     getInfo(): SceneStatus;
     getBounds(): THREE.Box3;
     getCenter(): THREE.Vector3;
