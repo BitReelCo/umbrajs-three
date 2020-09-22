@@ -6,10 +6,7 @@ requirejs.config({
   },
 })
 
-requirejs(['three', '../../dist/umbrajs-three.amd'], function(
-  THREE,
-  UmbraRuntime,
-) {
+requirejs(['three', '../../dist/umbrajs-three.amd'], function(THREE, UmbraRuntime) {
   'use strict'
 
   // First create a three.js renderer
@@ -18,6 +15,7 @@ requirejs(['three', '../../dist/umbrajs-three.amd'], function(
 
   let init = UmbraRuntime.initWithThreeJS(renderer, {
     wasmURL: '/dist/umbra.wasm',
+    workerScriptURL: '/dist/UmbraAssetWorker.js',
   })
   let sceneInit = init.then(function(Umbra) {
     // Create the Umbra scene object
@@ -30,12 +28,7 @@ requirejs(['three', '../../dist/umbrajs-three.amd'], function(
     // Set up a basic three.js scene
     let scene = new THREE.Scene()
     scene.background = new THREE.Color(0x222222)
-    let camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.01,
-      1000,
-    )
+    let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.01, 1000)
 
     renderer.setSize(window.innerWidth, window.innerHeight)
 
