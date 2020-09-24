@@ -22,7 +22,7 @@ import { SharedFrameState } from './SharedFrameState'
 import { UmbraScene, SceneFactory, MeshDescriptor } from './Scene'
 import { WebGLRenderer } from 'three'
 import { HeapBufferView } from '@umbra3d/umbrajs/dist/Heap'
-import { UserPointer } from '@umbra3d/umbrajs/dist/NativeTypes'
+import { TextureFormat, UserPointer } from '@umbra3d/umbrajs/dist/NativeTypes'
 
 export type UmbraCamera = THREE.Camera & {
   umbraStreamingPosition?: THREE.Vector3
@@ -392,8 +392,13 @@ class UmbrajsThreeInternal implements SceneFactory {
       }
 
       if (!glformat) {
+        // At the moment we ignore "UINT32" textures because they can't be rendered with stock three.js shaders.
+        if (info.format !== TextureFormat.UINT32) {
+          // For others we emit a message since this shouldn't happen.
+          console.log('Unknown texture format', TextureFormat[info.format])
+        }
+
         // Add a dummy object for unknown formats. They will appear as a solid black color.
-        console.log('Unknown texture format', info.format)
         this.runtime.addAsset(assetID, { isTexture: false })
         return Assets.AssetLoadResult.Success
       }
