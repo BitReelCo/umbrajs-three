@@ -25,7 +25,7 @@
     "@umbra3d/umbrajs": "1.7.41-hotfix1"
   },
   "peerDependencies": {
-    "three": "0.106.2 || 0.107.0 || 0.108.0 || 0.110.0"
+    "three": ">=0.106.2 <=0.122.0"
   },
   "devDependencies": {
     "@babel/core": "7.10.5",
