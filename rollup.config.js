@@ -1,5 +1,5 @@
+import typescript from 'rollup-plugin-typescript2'
 import resolve from 'rollup-plugin-node-resolve'
-import babel from '@rollup/plugin-babel'
 import { eslint } from 'rollup-plugin-eslint'
 import { terser } from 'rollup-plugin-terser'
 import fs from 'fs'
@@ -15,14 +15,12 @@ function copyfiles(files) {
   }
 }
 
-const extensions = ['.js', '.ts']
-
 const commonPlugins = () => [
-  resolve({ extensions }),
+  resolve({ extensions: ['.js', '.ts'] }),
   eslint({
     include: 'src/*',
   }),
-  babel({ extensions, include: ['src/**/*'], babelHelpers: 'bundled' }),
+  typescript({}),
   copyfiles([
     ['node_modules/@umbra3d/umbrajs/dist/umbra.wasm', 'dist/umbra.wasm'],
     ['node_modules/@umbra3d/umbrajs/dist/UmbraAssetWorker.wasm', 'dist/UmbraAssetWorker.wasm'],

@@ -28,11 +28,6 @@
     "three": ">=0.106.2 <=0.122.0"
   },
   "devDependencies": {
-    "@babel/core": "7.10.5",
-    "@babel/plugin-proposal-class-properties": "7.10.4",
-    "@babel/preset-env": "7.5.5",
-    "@babel/preset-typescript": "7.10.4",
-    "@rollup/plugin-babel": "5.1.0",
     "@typescript-eslint/eslint-plugin": "2.34.0",
     "@typescript-eslint/parser": "2.34.0",
     "add": "2.0.6",
@@ -49,7 +44,8 @@
     "rollup": "2.23.0",
     "rollup-plugin-eslint": "7.0.0",
     "rollup-plugin-node-resolve": "5.2.0",
-    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-terser": "7.0.2",
+    "rollup-plugin-typescript2": "0.27.1",
     "terser": "4.8.0",
     "typescript": "3.9.7"
   }
