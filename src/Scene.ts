@@ -81,12 +81,12 @@ export class UmbraScene extends THREE.Object3D {
   private diagnostics = {
     missingNormals: {
       checked: false,
-      message:
-        'Property umbraScene.opaqueMaterial has been deprecated. Use umbraScene.material instead.',
+      message: 'UmbraScene has no normals so it will appear black.',
     },
     deprecatedMaterial: {
       checked: false,
-      message: 'UmbraScene has no normals so it will appear black.',
+      message:
+        'Property umbraScene.opaqueMaterial has been deprecated. Use umbraScene.material instead.',
     },
     report: (field: string) => {
       if (!this.diagnostics[field].checked) {
