@@ -29,7 +29,7 @@
   const libinfo = Umbra.umbrajs.getLibraryInfo()
   console.log(`Runtime build time: ${libinfo.buildTime}`)
   console.log(`Runtime build hash: ${libinfo.version}`)
-  let umbraScene = Umbra.createScene('key=pubk-6f592e67-5aec-479a-ad9e-46ad4e4fe699&project=745415655&model=745415871')
+  let umbraScene = Umbra.createScenePublic('key=pubk-6f592e67-5aec-479a-ad9e-46ad4e4fe699&project=745415655&model=745415871')
 
   // Set up a basic three.js scene
   let scene = new THREE.Scene()

@@ -8,8 +8,8 @@ export class Loader extends THREE.Loader {
     this.Umbra = Umbra
   }
 
-  load(url: string, onLoad, onProgress, onError) {
-    const model = this.Umbra.createScene(url)
+  loadPublic(url: string, onLoad, onProgress, onError) {
+    const model = this.Umbra.createScenePublic(url)
 
     if (onError) {
       model.onConnectionError = err => {

@@ -17,7 +17,6 @@ import {
   LibraryConfig,
 } from '@umbra3d/umbrajs'
 import { ThreeFormats } from './ThreeFormats'
-import { PublicLink } from './PublicLink'
 import { SharedFrameState } from './SharedFrameState'
 import { UmbraScene, SceneFactory, MeshDescriptor } from './Scene'
 import { WebGLRenderer } from 'three'
@@ -260,33 +259,19 @@ class UmbrajsThreeInternal implements SceneFactory {
     }
   }
 
-  createScene(link: string | PublicLink): UmbraScene {
-    let url: string
-    if (typeof link === 'string') {
-      url = link
-    } else if (typeof link === 'object') {
-      if (('token' in link) as any) {
-        console.warn(
-          'Connection with {token, projectID, modelID} is deprecated. Use {key, project, model} or a string locator instad.',
-        )
-        link.key = link['token']
-        link.project = link['projectID']
-        link.model = link['modelID']
-      }
-
-      if (!('key' in link && 'project' in link && 'model' in link)) {
-        throw new Error(
-          'createScene() expects an object with properties "key", "project", and "model"',
+  createScene(apiKey: string, locator: string): UmbraScene {
+    if (typeof locator !== 'string') {
+      if (typeof locator === 'object') {
+        console.error(
+          'Connection with an {key, project, model} object is deprecated. Use a locator string instead.',
         )
       }
-      url = `key=${link.key}&project=${link.project}&model=${link.model}`
-    } else {
-      throw new TypeError('expected either string or an object argument')
+      throw new TypeError('expected a string argument')
     }
 
     const umbraScene = new UmbraScene(
       this.runtime,
-      this.runtime.createScenePublic(url),
+      this.runtime.createScene(apiKey, locator),
       this.sharedState,
       this.renderer,
       this.features,
@@ -296,7 +281,29 @@ class UmbrajsThreeInternal implements SceneFactory {
     return umbraScene
   }
 
-  createSceneWithURL(url: string): UmbraScene {
+  createScenePublic(link: string): UmbraScene {
+    if (typeof link !== 'string') {
+      if (typeof link === 'object') {
+        console.error(
+          'Connection with an {key, project, model} object is deprecated. Use a public link string instead.',
+        )
+      }
+      throw new TypeError('expected a string argument')
+    }
+
+    const umbraScene = new UmbraScene(
+      this.runtime,
+      this.runtime.createScenePublic(link),
+      this.sharedState,
+      this.renderer,
+      this.features,
+      s => this.umbraScenes.delete(s),
+    )
+    this.umbraScenes.add(umbraScene)
+    return umbraScene
+  }
+
+  createSceneLocal(url: string): UmbraScene {
     const scene = this.runtime.createSceneLocal(url)
     const umbraScene = new UmbraScene(
       this.runtime,
@@ -308,6 +315,10 @@ class UmbrajsThreeInternal implements SceneFactory {
     )
     this.umbraScenes.add(umbraScene)
     return umbraScene
+  }
+
+  createSceneWithURL(url: string): UmbraScene {
+    return this.createSceneLocal(url)
   }
 
   /**
