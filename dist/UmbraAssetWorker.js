@@ -78,7 +78,7 @@ function ka(a) {
 var la, B;
 g.wasmBinary && (B = g.wasmBinary);
 "object" !== typeof WebAssembly && A("no native wasm support detected");
-var C, ma = new WebAssembly.Table({initial:400, maximum:400, element:"anyfunc"}), D = !1;
+var C, ma = new WebAssembly.Table({initial:401, maximum:401, element:"anyfunc"}), D = !1;
 function assert(a, b) {
   a || y("Assertion failed: " + b);
 }
@@ -130,7 +130,7 @@ g.wasmMemory ? C = g.wasmMemory : C = new WebAssembly.Memory({initial:qa / 65536
 C && (buffer = C.buffer);
 qa = buffer.byteLength;
 pa(buffer);
-J[6056] = 5267264;
+J[6060] = 5267280;
 function ra(a) {
   for (; 0 < a.length;) {
     var b = a.shift();
@@ -1661,7 +1661,7 @@ var Wb = {__cxa_atexit:function() {
 }, abort:function() {
   y();
 }, emscripten_get_sbrk_ptr:function() {
-  return 24224;
+  return 24240;
 }, emscripten_memcpy_big:function(a, b, c) {
   I.set(I.subarray(b, b + c), a);
 }, emscripten_resize_heap:function(a) {
@@ -1920,13 +1920,13 @@ g._UmbraExternalMeshStreamDone = function() {
 g._UmbraExternalMeshStreamNext = function() {
   return g.asm.UmbraExternalMeshStreamNext.apply(null, arguments);
 };
+var db = g._malloc = function() {
+  return g.asm.malloc.apply(null, arguments);
+}, Tb = g._free = function() {
+  return g.asm.free.apply(null, arguments);
+};
 g.___errno_location = function() {
   return g.asm.__errno_location.apply(null, arguments);
-};
-var Tb = g._free = function() {
-  return g.asm.free.apply(null, arguments);
-}, db = g._malloc = function() {
-  return g.asm.malloc.apply(null, arguments);
 };
 g.__get_tzname = function() {
   return g.asm._get_tzname.apply(null, arguments);
@@ -1952,14 +1952,14 @@ g.stackRestore = function() {
 g.__growWasmMemory = function() {
   return g.asm.__growWasmMemory.apply(null, arguments);
 };
-g.dynCall_vi = function() {
-  return g.asm.dynCall_vi.apply(null, arguments);
-};
 g.dynCall_vii = function() {
   return g.asm.dynCall_vii.apply(null, arguments);
 };
 g.dynCall_iiii = function() {
   return g.asm.dynCall_iiii.apply(null, arguments);
+};
+g.dynCall_vi = function() {
+  return g.asm.dynCall_vi.apply(null, arguments);
 };
 g.dynCall_iidiiii = function() {
   return g.asm.dynCall_iidiiii.apply(null, arguments);
