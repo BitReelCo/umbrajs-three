@@ -1,9 +1,10 @@
 import * as THREE from './ThreeWrapper';
 import { PlatformFeatures, Runtime, NativeScene, ConnectionStatus } from '@umbra3d/umbrajs';
 import { SharedFrameState } from './SharedFrameState';
-import { PublicLink } from './PublicLink';
 export interface SceneFactory {
-    createScene(link: string | PublicLink): UmbraScene;
+    createScene(apiKey: string, locator: string): UmbraScene;
+    createScenePublic(link: string): UmbraScene;
+    createSceneLocal(url: string): UmbraScene;
     createSceneWithURL(url: string): UmbraScene;
 }
 interface SceneStatus {

@@ -1,6 +1,5 @@
 import * as THREE from './ThreeWrapper';
 import { UmbraInstance, LibraryConfig } from '@umbra3d/umbrajs';
-import { PublicLink } from './PublicLink';
 import { UmbraScene, SceneFactory } from './Scene';
 import { WebGLRenderer } from 'three';
 export declare type UmbraCamera = THREE.Camera & {
@@ -38,7 +37,9 @@ declare class UmbrajsThreeInternal implements SceneFactory {
     private pruneOldViews;
     private updateViews;
     update(timeBudget?: number): void;
-    createScene(link: string | PublicLink): UmbraScene;
+    createScene(apiKey: string, locator: string): UmbraScene;
+    createScenePublic(link: string): UmbraScene;
+    createSceneLocal(url: string): UmbraScene;
     createSceneWithURL(url: string): UmbraScene;
     /**
      * Returns streaming information. We can't tell which files came from the browser cache
